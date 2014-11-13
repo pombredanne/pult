@@ -1,0 +1,24 @@
+{
+  "name" : "pult",
+  "type" : "web",
+  "version": "0.0.1",
+  "description" : "A boilerplate for FirefoxOS",
+  "launch_path" : "/index.html",
+  "icons" : {
+    "512" : "/img/icon-512.png",
+    "128" : "/img/icon-128.png"
+  },
+  "developer" : {
+    "name" : "Name of your organization or team",
+    "url"  : "https://www.your.org"
+  },
+  "default_locale" : "en",
+  "chrome" : {"navigation" : false},
+  "fullscreen" : false,
+  "orientation" : "landscape",
+  "origin" : "app://pult.app",
+  "permissions" : {
+    "push" : {"description" : "Required for being updated after ..."}
+  },
+  "docs":  "https://developer.mozilla.org/en-US/Apps/Build/Manifest"
+}
