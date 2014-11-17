@@ -13,8 +13,10 @@
                                  "btn-right" :RIGHT
                                  "btn-left" :LEFT
                                  "btn-down" :DOWN
-                                 "btn-a" :A
-                                 "btn-b" :B}}))
+                                 "btn-a" :X
+                                 "btn-b" :Z
+                                 "btn-select" :SHIFT
+                                 "btn-start" :ENTER}}))
 
 ;;-- helpers
 (defn current-time []
@@ -67,10 +69,11 @@
   [incoming-ch]
   (go-loop []
     (when-let [{:keys [message error]} (<! incoming-ch)]
-      (if error
-        (.debug js/console "Got new message: " message)
+      (if message
         (when (= :command (:id message))
-          (.debug js/console "Lag: " (- (current-time) (:start message)))))
+          (.debug js/console "Lag: " (- (current-time) (:start message))))
+        (.debug js/console "Got error: " message))
+      (vibrate! 20)
       (recur))))
 
 (defn start-messenger
@@ -142,11 +145,16 @@
         on-action (fn [ev]
                     (.debug js/console "user clicked on action button" ev)
                     (let [btn-id (.. ev -target -id)]
+                      ;;TODO: keep flooding until keyUP
                       (async/put! outgoing-ch
                                   {:id :command
                                    :action :key-press
+                                   :duration 2
+                                   :delay 5
                                    :key (get-in @app-state [:mappings btn-id] :not-mapped)
-                                   :start (current-time)})))]
+                                   :times 1
+                                   :start (current-time)})
+                      (vibrate! 10)))]
     (if (nil? svg-doc)
       (.error js/console "Failed to load controller UI.")
       (do
