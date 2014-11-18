@@ -1,6 +1,6 @@
 (defproject pult "0.0.1"
   :description "A boilerplate for FirefoxOS"
-  :url "https://your.org"
+  :url "https://github.com/tauho/pult"
   :license {:name "MIT"
             :comments "Change before releasing it publicly."}
   :min-lein-version "2.5.0"

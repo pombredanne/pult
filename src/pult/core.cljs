@@ -8,13 +8,13 @@
                       :connection nil
                       :incoming-ch (async/chan 10)
                       :outgoing-ch (async/chan (async/sliding-buffer 10))
-                      :event-ch (async/chan (async/sliding-buffer 100))
+                      :event-ch (async/chan 10)
                       :mappings {"btn-up" :UP
                                  "btn-right" :RIGHT
                                  "btn-left" :LEFT
                                  "btn-down" :DOWN
-                                 "btn-a" :X
-                                 "btn-b" :Z
+                                 "btn-a" :A
+                                 "btn-b" :S
                                  "btn-select" :SHIFT
                                  "btn-start" :ENTER}}))
 
@@ -39,7 +39,6 @@
 (defn show-by-id!
   [id]
   (.setAttribute (by-id id) "style" "display:block"))
-
 
 (defn vibrate!
   [duration]
@@ -73,7 +72,6 @@
         (when (= :command (:id message))
           (.debug js/console "Lag: " (- (current-time) (:start message))))
         (.debug js/console "Got error: " message))
-      (vibrate! 20)
       (recur))))
 
 (defn start-messenger
@@ -114,8 +112,8 @@
                            (str "<p style = \"background-color: orange;\" >" msg "</p>")))
         uri (str "ws://" (get form-dt "url") ":"
                  (get form-dt "port") "/" (get form-dt "path"))]
-    (.debug js/console "Form data:" (pr-str form-dt))
     (.preventDefault ev)
+    (vibrate! 20)
     (go
       (if-let [succ (<! (start-messenger uri {:format :edn}))]
         (do
@@ -125,8 +123,7 @@
           (show-by-id! "controller"))
         (do
           (.debug js/console "Connection failure.")
-          (show-error "connection-msg" "Connection failure!")
-          )))))
+          (show-error "connection-msg" "Connection failure!"))))))
 
 (defn register-events!
   [doc-obj selector-actions]
@@ -136,44 +133,60 @@
       (.error js/console
               (str "Failed to register event for:" selector " , " action-name)))))
 
+(defn send-actions
+  "listen controller actions on event channel and sends it to the server"
+  [outgoing-ch event-feed action-id]
+  (let [ctrl-ch (async/chan (async/sliding-buffer 5))]
+    (async/sub event-feed action-id ctrl-ch)
+    (.debug js/console "Listening controller events ...")
+    (go-loop []
+      (when-let [action (<! ctrl-ch)]
+        (let [btn-id (.. (:event action) -target -id)
+              btn-code (get-in @app-state [:mappings btn-id] :not-mapped)]
+          (async/put! outgoing-ch {:id :command
+                                   :action action-id
+                                   :key btn-code
+                                   :duration 100
+                                   :delay 5
+                                   :start (current-time)})
+          (vibrate! 10)
+          (recur))))))
+
 (defn ^:export main
   []
   (let [control-obj (by-id js/document "control-object")
         svg-doc (.-contentDocument control-obj)
         incoming-ch (:incoming-ch @app-state) ;(async/chan 10)
         outgoing-ch (:outgoing-ch @app-state) ;(async/chan (async/sliding-buffer 10))
-        on-action (fn [ev]
-                    (.debug js/console "user clicked on action button" ev)
-                    (let [btn-id (.. ev -target -id)]
-                      ;;TODO: keep flooding until keyUP
-                      (async/put! outgoing-ch
-                                  {:id :command
-                                   :action :key-press
-                                   :duration 2
-                                   :delay 5
-                                   :key (get-in @app-state [:mappings btn-id] :not-mapped)
-                                   :times 1
-                                   :start (current-time)})
-                      (vibrate! 10)))]
+        event-ch (:event-ch @app-state)
+        event-feed (async/pub event-ch :action)
+        action-fn (fn [ev]
+                   (async/put! event-ch
+                               {:action :key-press
+                                :event ev}))]
     (if (nil? svg-doc)
       (.error js/console "Failed to load controller UI.")
       (do
         (.debug js/console "Registering button actions...")
         ;;-- register app events
-        (register-events! js/document
-                          [["connection-submit" "click" on-connect]])
+        (.addEventListener (by-id js/document "connection-submit")
+                           "click"
+                           on-connect)
         ;;-- register controller events
         (register-events! svg-doc
-                          [["btn-up"    "click" on-action]
-                           ["btn-down"  "click" on-action]
-                           ["btn-left"  "click" on-action]
-                           ["btn-right" "click" on-action]
-                           ["btn-a"     "click" on-action]
-                           ["btn-b"     "click" on-action]
-                           ["btn-select" "click" on-action]
-                           ["btn-start" "click" on-action]
-                           ["btn-configure" "click" on-action]
-                           ["btn-connect" "click" on-disconnect]
-                           ])))))
+                          [["btn-up"    "click" action-fn]
+                           ["btn-down"  "click" action-fn]
+                           ["btn-left"  "click" action-fn]
+                           ["btn-right" "click" action-fn]
+                           ["btn-a"     "click" action-fn]
+                           ["btn-b"     "click" action-fn]
+                           ["btn-select" "click" action-fn]
+                           ["btn-start" "click" action-fn]
+                           ["btn-configure" "click" action-fn]
+                           ["btn-connect" "click" action-fn]])
+
+        ;;-- push controller cought action to the server
+        (send-actions outgoing-ch event-feed :key-press)
+        ))))
 
 (main)
