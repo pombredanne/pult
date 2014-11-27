@@ -4,7 +4,10 @@
             [cljs.core.async :as async
                              :refer [<! >!]]
             [freactive.dom :as dom]
-            [pult.views.connection :as conn-app]))
+            [pult.utils :refer [current-time by-id by-tag-name
+                                hide-by-id! show-by-id!]]
+            [pult.views.connection :as conn-app]
+            [pult.views.controller :as ctrl-app]))
 
 (defonce app-state (atom {:uri "ws://127.0.0.1:8080/ws"
                           :connection nil
@@ -22,27 +25,6 @@
                                      "btn-start" :ENTER}}))
 
 ;;-- helpers
-(defn current-time []
-  (.getTime (js/Date.)))
-
-(defn by-id
-  ([id]
-    (by-id js/document id))
-  ([dom-obj id]
-    (.getElementById dom-obj id)))
-
-(defn by-tag-name
-  ([dom-obj tag-name]
-    (.getElementsByTagName dom-obj tag-name)))
-
-(defn hide-by-id!
-  [id]
-  (.setAttribute (by-id id) "style" "display:none"))
-
-(defn show-by-id!
-  [id]
-  (.setAttribute (by-id id) "style" "display:block"))
-
 (defn vibrate!
   [duration]
   (.vibrate js/navigator duration))
@@ -56,7 +38,6 @@
   [ws-channel outgoing-ch]
   (async/pipe outgoing-ch ws-channel false))
 
-;;TODO: handle-received-messages
 (defn handle-received-messages
   [incoming-ch]
   (go-loop []
@@ -126,14 +107,6 @@
         (connect conn-dt)
         (recur)))))
 
-(defn register-events!
-  [doc-obj selector-actions]
-  (doseq [[selector action-name action-fn] selector-actions]
-    (if-let [target (by-id doc-obj selector)]
-      (.addEventListener target action-name action-fn)
-      (.error js/console
-              (str "Failed to register event for:" selector " , " action-name)))))
-
 (defmulti event->action
   (fn [ev] (.-type ev)))
 
@@ -183,59 +156,18 @@
 
 (defn ^:export main []
   (let [connection-container (by-id "connection")
-        control-obj (by-id js/document "control-object")
-        svg-doc (.-contentDocument control-obj)
-        incoming-ch (:incoming-ch @app-state)
+        controller-container (by-id "controller")
         outgoing-ch (:outgoing-ch @app-state)
         event-ch (:event-ch @app-state)
-        event-feed (async/pub event-ch :source)
-        into-feed (fn [ev]
-                   (async/put! event-ch
-                               {:source :controller
-                                :event ev}))]
-    (if (nil? svg-doc)
-      (.error js/console "Failed to load controller UI.")
-      (do
-        (.debug js/console "Registering components...")
-        ;;-- init app views
-        (dom/mount! connection-container (conn-app/main app-state))
+        event-feed (async/pub event-ch :source)]
+      (.debug js/console "Registering components...")
+      ;;-- init app views
+      (dom/mount! connection-container (conn-app/main app-state))
+      (dom/mount! controller-container (ctrl-app/main app-state))
 
-        ;;TODO: into own component-view;
-        (.debug js/console "Registering button actions...")
-        ;;-- register controller events
-        (register-events! svg-doc
-                          [
-                           ["btn-up"    "touchstart"  into-feed]
-                           ["btn-up"    "touchend"    into-feed]
-                           ["btn-up"    "mousedown"   into-feed]
-                           ["btn-up"    "mouseup"     into-feed]
-
-                           ["btn-down"  "touchstart"  into-feed]
-                           ["btn-down"  "touchend"    into-feed]
-                           ["btn-down"  "mousedown"   into-feed]
-                           ["btn-down"  "mouseup"     into-feed]
-
-                           ["btn-left"  "touchstart"  into-feed]
-                           ["btn-left"  "touchend"    into-feed]
-                           ["btn-left"  "mousedown"   into-feed]
-                           ["btn-left"  "mouseup"     into-feed]
-
-                           ["btn-right" "touchstart"  into-feed]
-                           ["btn-right" "touchend"    into-feed]
-                           ["btn-right" "mousedown"   into-feed]
-                           ["btn-right" "mouseup"     into-feed]
-
-                           ;;buttons with single impulse
-                           ["btn-a"     "click"       into-feed]
-                           ["btn-b"     "click"       into-feed]
-                           ["btn-select" "click"      into-feed]
-                           ["btn-start" "click"       into-feed]
-                           ["btn-configure" "click"   into-feed]
-                           ["btn-connect" "click"     into-feed]])
-
-        ;;-- push controller cought action to the server
-        (send-actions outgoing-ch event-feed :controller)
-        (on-connect event-feed :connection)
-        ))))
+      ;;-- push controller cought action to the server
+      (send-actions outgoing-ch event-feed :controller)
+      (on-connect event-feed :connection)
+      ))
 
 (main)
