@@ -2,22 +2,24 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chord.client :refer [ws-ch]]
             [cljs.core.async :as async
-                             :refer [<! >!]]))
+                             :refer [<! >!]]
+            [freactive.dom :as dom]
+            [pult.views.connection :as conn-app]))
 
-(def app-state (atom {:uri "ws://127.0.0.1:8080/ws"
-                      :connection nil
-                      :incoming-ch (async/chan 5)
-                      :outgoing-ch (async/chan (async/sliding-buffer 5))
-                      :event-ch (async/chan 10)
-                      :freq 10 ;how often generate impulses
-                      :mappings {"btn-up" :UP
-                                 "btn-right" :RIGHT
-                                 "btn-left" :LEFT
-                                 "btn-down" :DOWN
-                                 "btn-a" :A
-                                 "btn-b" :S
-                                 "btn-select" :SHIFT
-                                 "btn-start" :ENTER}}))
+(defonce app-state (atom {:uri "ws://127.0.0.1:8080/ws"
+                          :connection nil
+                          :incoming-ch (async/chan 5)
+                          :outgoing-ch (async/chan (async/sliding-buffer 5))
+                          :event-ch (async/chan 10)
+                          :freq 10 ;how often generate impulses
+                          :mappings {"btn-up" :UP
+                                     "btn-right" :RIGHT
+                                     "btn-left" :LEFT
+                                     "btn-down" :DOWN
+                                     "btn-a" :A
+                                     "btn-b" :S
+                                     "btn-select" :SHIFT
+                                     "btn-start" :ENTER}}))
 
 ;;-- helpers
 (defn current-time []
@@ -44,16 +46,6 @@
 (defn vibrate!
   [duration]
   (.vibrate js/navigator duration))
-
-(defn read-form-data
-  [form-id]
-  (let [form-els (by-tag-name (by-id form-id) "input")
-        n-els (.-length form-els)]
-    (into {}
-      (map
-        (fn [el] [(.-id el) (.-value el)])
-        (for [i (range 0 n-els)]
-          (.item form-els i))))))
 
 ;;-- message handlers
 (defn listen-messages
@@ -104,16 +96,14 @@
   (hide-by-id! "controller")
   (show-by-id! "connection"))
 
-(defn on-connect
-  [ev]
+(defn connect
+  [conn-dt]
   (.debug js/console "on connection")
-  (let [form-dt (read-form-data "connection-form")
+  (let [{:keys [url port path]} (:data conn-dt)
         show-error (fn [id msg]
                      (set! (.-innerHTML (by-id id))
                            (str "<p style = \"background-color: orange;\" >" msg "</p>")))
-        uri (str "ws://" (get form-dt "url") ":"
-                 (get form-dt "port") "/" (get form-dt "path"))]
-    (.preventDefault ev)
+        uri (str "ws://" url ":" port "/" path)]
     (vibrate! 20)
     (go
       (if-let [succ (<! (start-messenger uri {:format :edn}))]
@@ -125,6 +115,16 @@
         (do
           (.debug js/console "Connection failure.")
           (show-error "connection-msg" "Connection failure!"))))))
+
+(defn on-connect
+  [event-feed source-id]
+  (let [data-ch (async/chan 1)]
+    (.debug js/console "Waiting connection data.")
+    (async/sub event-feed source-id data-ch)
+    (go-loop []
+      (when-let [conn-dt (<! data-ch)]
+        (connect conn-dt)
+        (recur)))))
 
 (defn register-events!
   [doc-obj selector-actions]
@@ -181,12 +181,12 @@
           (vibrate! duration)
           (recur))))))
 
-(defn ^:export main
-  []
-  (let [control-obj (by-id js/document "control-object")
+(defn ^:export main []
+  (let [connection-container (by-id "connection")
+        control-obj (by-id js/document "control-object")
         svg-doc (.-contentDocument control-obj)
-        incoming-ch (:incoming-ch @app-state) ;(async/chan 10)
-        outgoing-ch (:outgoing-ch @app-state) ;(async/chan (async/sliding-buffer 10))
+        incoming-ch (:incoming-ch @app-state)
+        outgoing-ch (:outgoing-ch @app-state)
         event-ch (:event-ch @app-state)
         event-feed (async/pub event-ch :source)
         into-feed (fn [ev]
@@ -196,11 +196,12 @@
     (if (nil? svg-doc)
       (.error js/console "Failed to load controller UI.")
       (do
+        (.debug js/console "Registering components...")
+        ;;-- init app views
+        (dom/mount! connection-container (conn-app/main app-state))
+
+        ;;TODO: into own component-view;
         (.debug js/console "Registering button actions...")
-        ;;-- register app events
-        (.addEventListener (by-id js/document "connection-submit")
-                           "click"
-                           on-connect)
         ;;-- register controller events
         (register-events! svg-doc
                           [
@@ -234,6 +235,7 @@
 
         ;;-- push controller cought action to the server
         (send-actions outgoing-ch event-feed :controller)
+        (on-connect event-feed :connection)
         ))))
 
 (main)

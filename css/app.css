@@ -2,6 +2,16 @@ body {
   background: url('../img/icon-512.png') no-repeat;
 }
 
+.app-action {
+  overflow: hidden;
+  max-height: 98%;
+  max-height: 100%;
+}
+
+.app-action h1,h2,h3,h4,h5 {
+  color: white;
+}
+
 #connection-form {
   color: white;
 }

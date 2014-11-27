@@ -12,38 +12,14 @@
         <link rel="stylesheet" href="css/app.css">
     </head>
     <body>
-        <div class = "container pure-u-g">
-            <div id = "controller" class = "pure-u-1" style = "display: none;">
+        <div id = "app-container" class = "container pure-u-g">
+            <div id = "controller" class = "pure-u-1 app-action" style = "display: none;">
                 <object id = "control-object" type="image/svg+xml" data="img/control.svg"
                         width = "480" height = "320">
                     Your browser does not support SVG
                 </object>
             </div>
-            <div id = "connection" class = "pure-u-1" style = "display: true;">
-                <form id = "connection-form" class = "pure-form pure-form-aligned">
-                   <fieldset>
-                       <div class="pure-control-group">
-                          <label for="url">Url</label>
-                          <input id="url" name="url" type="text" value="127.0.0.1" />
-                       </div>
-                       <div class="pure-control-group">
-                          <label for="url">Port</label>
-                          <input id="port" name="port" type="text" value="8080" />
-                       </div>
-                       <div class="pure-control-group">
-                          <label for="path">Path</label>
-                          <input id="path" name="path" type="text" value="ws" />
-                       </div>
-                       <div class="pure-controls">
-                          <button id = "connection-submit" type="ok" 
-                                  class="pure-button button-error">
-                              Connect
-                          </button>
-                       </div> 
-                  </fieldset>
-                </form>
-                <div id  = "connection-msg"></div>
-            </div>
+            <div id = "connection" class = "pure-u-1 app-action" style = "display: true;"></div>
         </div>
         <script src="js/pult-dev.js" type="text/javascript"></script>
         <!--
