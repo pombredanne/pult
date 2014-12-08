@@ -1,5 +1,5 @@
 (defproject pult "0.0.1"
-  :description "A boilerplate for FirefoxOS"
+  :description "Remote control for Game emulators"
   :url "https://github.com/tauho/pult"
   :license {:name "MIT"
             :comments "Change before releasing it publicly."}
@@ -7,15 +7,17 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2371"]
                  [org.clojure/core.async  "0.1.346.0-17112a-alpha"]
-                 [freactive "0.1.0"]
+                 [reagent "0.4.3"]
                  [environ "1.0.0"]
                  [com.cemerick/piggieback "0.1.3"]
                  [weasel "0.4.0-SNAPSHOT"]
-                 [jarohen/chord "0.4.2" :exclusions [org.clojure/clojure]]]
+                 [jarohen/chord "0.4.2" :exclusions [org.clojure/clojure]]
+                 [cljs-idxdb "0.1.0"]]
   :plugins [[lein-cljsbuild "1.0.3"
              lein-simpleton "1.3.0"]]
   :source-paths ["src"]
   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+  :preamble ["js/vendor/react.js"]
   :cljsbuild {:repl-launch-commands {
                 ;usage: lein trampoline cljsbuild repl-launch firefox
                 "firefox" ["firefox"] ;; to browse up on browser

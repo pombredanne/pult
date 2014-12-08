@@ -1,20 +1,24 @@
 (ns pult.core
+  (:refer-clojure :exclude [atom])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [chord.client :refer [ws-ch]]
             [cljs.core.async :as async
                              :refer [<! >!]]
-            [freactive.dom :as dom]
+            [reagent.core :as reagent :refer [atom]]
             [pult.utils :refer [current-time by-id by-tag-name
                                 hide-by-id! show-by-id!]]
             [pult.views.connection :as conn-app]
             [pult.views.controller :as ctrl-app]))
 
-(defonce app-state (atom {:uri "ws://127.0.0.1:8080/ws"
-                          :connection nil
+(defonce app-state (atom {:connection {:uri "ws://127.0.0.1:8080/ws"
+                                       :socket nil
+                                       :tab {:selected :prev}
+                                       :history [{:url "127.0.0.1"
+                                                  :port "9000"
+                                                  :path "ws"}]}
                           :incoming-ch (async/chan 5)
                           :outgoing-ch (async/chan (async/sliding-buffer 5))
                           :event-ch (async/chan 10)
-                          :freq 10 ;how often generate impulses
                           :mappings {"btn-up" :UP
                                      "btn-right" :RIGHT
                                      "btn-left" :LEFT
@@ -56,10 +60,10 @@
           outgoing-ch (:outgoing-ch @app-state)]
       (if error
         (do
-          (.error js/console "Cant open connection with the server." error)
+          (.error js/console "Cant open connection with the server." (pr-str error))
           false)
         (do
-          (swap! app-state (fn [xs] (assoc xs :connection ws-channel)))
+          (swap! app-state (fn [xs] (assoc-in xs [:connection :socket] ws-channel)))
           (listen-messages ws-channel incoming-ch)
           (send-messages ws-channel outgoing-ch)
           (handle-received-messages incoming-ch)
@@ -68,7 +72,7 @@
 
 (defn stop-messenger
   []
-  (swap! app-state (fn [xs] (assoc xs :connection nil))))
+  (swap! app-state (fn [xs] (assoc-in xs [:connection :socket] nil))))
 
 (defn on-disconnect
   [ev]
@@ -90,7 +94,7 @@
       (if-let [succ (<! (start-messenger uri {:format :edn}))]
         (do
           (.debug js/console "Connection success.")
-          (swap! app-state (fn [xs] (assoc xs :uri uri)))
+          (swap! app-state (fn [xs] (assoc-in xs [:connection :uri] uri)))
           (hide-by-id! "connection")
           (show-by-id! "controller"))
         (do
@@ -155,19 +159,16 @@
           (recur))))))
 
 (defn ^:export main []
-  (let [connection-container (by-id "connection")
-        controller-container (by-id "controller")
-        outgoing-ch (:outgoing-ch @app-state)
+  (let [outgoing-ch (:outgoing-ch @app-state)
         event-ch (:event-ch @app-state)
         event-feed (async/pub event-ch :source)]
       (.debug js/console "Registering components...")
       ;;-- init app views
-      (dom/mount! connection-container (conn-app/main app-state))
-      (dom/mount! controller-container (ctrl-app/main app-state))
+      (reagent/render-component [#(conn-app/main app-state)] (by-id "connection"))
+      (reagent/render-component [#(ctrl-app/main app-state)] (by-id "controller"))
 
       ;;-- push controller cought action to the server
       (send-actions outgoing-ch event-feed :controller)
-      (on-connect event-feed :connection)
-      ))
+      (on-connect event-feed :connection)))
 
 (main)
