@@ -4,18 +4,23 @@
   (:require [chord.client :refer [ws-ch]]
             [cljs.core.async :as async
                              :refer [<! >!]]
-            [reagent.core :as reagent :refer [atom]]
+            [reagent.core :as reagent :refer [atom cursor]]
+            [pult.db :as db]
+            [pult.models.history :as history-mdl]
             [pult.utils :refer [current-time by-id by-tag-name
                                 hide-by-id! show-by-id!]]
             [pult.views.connection :as conn-app]
             [pult.views.controller :as ctrl-app]))
 
-(defonce app-state (atom {:connection {:uri "ws://127.0.0.1:8080/ws"
+;history item: {:url "" :port "" :path ""}
+
+(defonce app-state (atom {:db {:name "pultdb"
+                               :version 1
+                               :connection nil}
+                          :connection {:uri "ws://127.0.0.1:8080/ws"
                                        :socket nil
                                        :tab {:selected :prev}
-                                       :history [{:url "127.0.0.1"
-                                                  :port "9000"
-                                                  :path "ws"}]}
+                                       :history []}
                           :incoming-ch (async/chan 5)
                           :outgoing-ch (async/chan (async/sliding-buffer 5))
                           :event-ch (async/chan 10)
@@ -35,6 +40,7 @@
 
 ;;-- message handlers
 (defn listen-messages
+  "listend incoming messages from server"
   [ws-channel incoming-ch]
   (async/pipe ws-channel incoming-ch false))
 
@@ -102,13 +108,20 @@
           (show-error "connection-msg" "Connection failure!"))))))
 
 (defn on-connect
+  "listen connection event on event-feed"
   [event-feed source-id]
   (let [data-ch (async/chan 1)]
     (.debug js/console "Waiting connection data.")
     (async/sub event-feed source-id data-ch)
     (go-loop []
       (when-let [conn-dt (<! data-ch)]
-        (connect conn-dt)
+        (let [db (cursor [:db] app-state)
+              history (cursor [:connection :history] app-state)]
+          (connect conn-dt)
+          (history-mdl/add
+            db conn-dt
+            (fn [_]
+              (history-mdl/get-n-latest db 10 #(reset! history %)))))
         (recur)))))
 
 (defmulti event->action
@@ -158,10 +171,24 @@
           (vibrate! duration)
           (recur))))))
 
+(defn start-db
+  [app-state]
+  (let [db (cursor [:db] app-state)
+        history (cursor [:connection :history] app-state)]
+    (db/connect
+      db
+      (fn [conn]
+        (.log js/console "Database is now connected.")
+        (swap! db #(assoc % :connection conn))
+        (history-mdl/get-n-latest db 10 #(reset! history %))))))
+
 (defn ^:export main []
   (let [outgoing-ch (:outgoing-ch @app-state)
         event-ch (:event-ch @app-state)
         event-feed (async/pub event-ch :source)]
+      ;connect db & load initial data
+      (start-db app-state)
+
       (.debug js/console "Registering components...")
       ;;-- init app views
       (reagent/render-component [#(conn-app/main app-state)] (by-id "connection"))

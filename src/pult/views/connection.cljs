@@ -83,7 +83,8 @@
                                (async/put! event-ch
                                            {:source :connection
                                             :data item}))}
-                (str "ws://" (:url item) ":" (:port item)
+                (str "ws://" (:url item)
+                     ":" (:port item)
                      "/" (:path item))]])]])]))
 
 (defn main [global-app-state]
