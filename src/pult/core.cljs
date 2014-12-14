@@ -31,7 +31,11 @@
                                      "btn-a" :A
                                      "btn-b" :S
                                      "btn-select" :SHIFT
-                                     "btn-start" :ENTER}}))
+                                     "btn-start" :ENTER}
+                          :settings {:editing-profile ""
+                                     :profiles {"new" {:name "new"
+                                                       :mappings {"btn-up" :UP}}}}
+                          }))
 
 ;;-- helpers
 (defn vibrate!
@@ -198,4 +202,5 @@
       (send-actions outgoing-ch event-feed :controller)
       (on-connect event-feed :connection)))
 
-(main)
+;TODO: controll views with secretary
+;(main)

@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "0.0-2371"]
                  [org.clojure/core.async  "0.1.346.0-17112a-alpha"]
                  [reagent "0.4.3"]
+                 [secretary "1.2.1"]
                  [environ "1.0.0"]
                  [com.cemerick/piggieback "0.1.3"]
                  [weasel "0.4.0-SNAPSHOT"]
