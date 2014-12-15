@@ -46,7 +46,7 @@
   [profiles profile-id]
   (let [res (filter #(= profile-id (:name %1)) profiles)]
     (if (empty? res)
-      {:name "unknown_profile" :description "error"} ;default-profile
+      default-profile
       (first res))))
 
 (defn profile-form
@@ -148,7 +148,7 @@
     [:div {:class "pure-u-1"}
      (menu-action/render
        [:h3 (str "Profile: " profile-id)]
-       "#mappings"
+       "#settings/mappings"
        [:div {:class "pure-u-1"}
         (profile-controls profiles-cur profile-id)
         (profile-form profiles-cur profile-id)])]

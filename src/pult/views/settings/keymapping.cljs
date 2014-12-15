@@ -13,12 +13,12 @@
           [:span
             [:h3 {:class "pull-left"} "Keymappings"]
             [:a
-              {:href "#mappings/new"
+              {:href "#settings/mappings/new"
                :class "pure-button button-secondary pull-right"}
               [:i {:class "fa fa-plus"}]]]
-          "/settings"
+          "#settings"
           (vec (map
                  (fn [{:keys [name]}]
-                   [(str "#mappings/" name) name (= name active-profile-id)])
+                   [(str "#settings/mappings/" name) name (= name active-profile-id)])
                  (:items @profiles-cur))))])))
 

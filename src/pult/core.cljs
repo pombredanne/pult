@@ -6,11 +6,11 @@
                              :refer [<! >!]]
             [reagent.core :as reagent :refer [atom cursor]]
             [pult.db :as db]
+            [pult.routes :as routes]
             [pult.models.history :as history-mdl]
             [pult.utils :refer [current-time by-id by-tag-name
                                 hide-by-id! show-by-id!]]
-            [pult.views.connection :as conn-app]
-            [pult.views.controller :as ctrl-app]))
+            ))
 
 ;history item: {:url "" :port "" :path ""}
 
@@ -32,9 +32,11 @@
                                      "btn-b" :S
                                      "btn-select" :SHIFT
                                      "btn-start" :ENTER}
-                          :settings {:editing-profile ""
-                                     :profiles {"new" {:name "new"
-                                                       :mappings {"btn-up" :UP}}}}
+                          :profiles {:active nil
+                                     :editing nil
+                                     :items [{:name "mock1"
+                                              :description "just plain mock"
+                                              :mappings {"btn-up" :UP}}]}
                           }))
 
 ;;-- helpers
@@ -192,15 +194,10 @@
         event-feed (async/pub event-ch :source)]
       ;connect db & load initial data
       (start-db app-state)
-
-      (.debug js/console "Registering components...")
-      ;;-- init app views
-      (reagent/render-component [#(conn-app/main app-state)] (by-id "connection"))
-      (reagent/render-component [#(ctrl-app/main app-state)] (by-id "controller"))
-
+      ;mount router
+      (routes/mount app-state)
       ;;-- push controller cought action to the server
       (send-actions outgoing-ch event-feed :controller)
       (on-connect event-feed :connection)))
 
-;TODO: controll views with secretary
-;(main)
+(main) ;FXOS doesnt allow inline code & dont include it for tests
