@@ -4,8 +4,6 @@
 (def db-name "pultdb")
 (def db-version 1)
 
-
-
 ;;TODO: add better migration function
 (defn connect
   "initializes a new db connection

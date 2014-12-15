@@ -3,6 +3,7 @@
 (defn current-time []
   (.getTime (js/Date.)))
 
+;;-- DOM helpers
 (defn by-id
   ([id]
     (by-id js/document id))
@@ -21,4 +22,10 @@
   [id]
   (.setAttribute (by-id id) "style" "display:block"))
 
+;;-- logging helpers
+(defn log [& msgs]
+  (.log js/console (apply str msgs)))
+
+(defn error [& msgs]
+  (.error js/console (apply str msgs)))
 
