@@ -39999,8 +39999,8 @@ pult.models.profiles.store_index = "idIndex";
 pult.models.profiles.add = function() {
   var add = null;
   var add__2 = function(db, profile_dt) {
-    return add.call(null, db, profile_dt, function(p1__29076_SHARP_) {
-      return pult.utils.log.call(null, "Added new profile:", cljs.core.pr_str.call(null, p1__29076_SHARP_));
+    return add.call(null, db, profile_dt, function(p1__10634_SHARP_) {
+      return pult.utils.log.call(null, "Added new profile:", cljs.core.pr_str.call(null, p1__10634_SHARP_));
     });
   };
   var add__3 = function(db, profile_dt, success_fn) {
@@ -40022,8 +40022,8 @@ pult.models.profiles.add = function() {
 pult.models.profiles.upsert = function() {
   var upsert = null;
   var upsert__2 = function(db, profile_dt) {
-    return upsert.call(null, db, profile_dt, function(p1__29077_SHARP_) {
-      return pult.utils.log.call(null, "Upserted profile", cljs.core.pr_str.call(null, p1__29077_SHARP_));
+    return upsert.call(null, db, profile_dt, function(p1__10635_SHARP_) {
+      return pult.utils.log.call(null, "Upserted profile", cljs.core.pr_str.call(null, p1__10635_SHARP_));
     });
   };
   var upsert__3 = function(db, profile_dt, success_fn) {
@@ -40045,8 +40045,8 @@ pult.models.profiles.upsert = function() {
 pult.models.profiles.get_by = function() {
   var get_by = null;
   var get_by__2 = function(db, profile_name) {
-    return get_by.call(null, db, profile_name, function(p1__29078_SHARP_) {
-      return pult.utils.log.call(null, "Got: ", cljs.core.pr_str.call(null, p1__29078_SHARP_));
+    return get_by.call(null, db, profile_name, function(p1__10636_SHARP_) {
+      return pult.utils.log.call(null, "Got: ", cljs.core.pr_str.call(null, p1__10636_SHARP_));
     });
   };
   var get_by__3 = function(db, profile_name, success_fn) {
@@ -40071,19 +40071,19 @@ pult.models.profiles.get_all = function get_all(db, success_fn) {
 pult.models.profiles.delete_by = function() {
   var delete_by = null;
   var delete_by__2 = function(db, profile_id) {
-    return delete_by.call(null, db, profile_id, function(p1__29079_SHARP_) {
-      return pult.utils.log.call(null, "Success: deleted profile ", cljs.core.pr_str.call(null, p1__29079_SHARP_));
+    return delete_by.call(null, db, profile_id, function(p1__10637_SHARP_) {
+      return pult.utils.log.call(null, "Success: deleted profile ", cljs.core.pr_str.call(null, p1__10637_SHARP_));
     });
   };
-  var delete_by__3 = function(db, profile_name, success_fn) {
-    return pult.models.helpers.remove_item.call(null, db, pult.models.profiles.store_name, pult.models.profiles.profile_id, success_fn);
+  var delete_by__3 = function(db, profile_id, success_fn) {
+    return pult.models.helpers.remove_item.call(null, db, pult.models.profiles.store_name, profile_id, success_fn);
   };
-  delete_by = function(db, profile_name, success_fn) {
+  delete_by = function(db, profile_id, success_fn) {
     switch(arguments.length) {
       case 2:
-        return delete_by__2.call(this, db, profile_name);
+        return delete_by__2.call(this, db, profile_id);
       case 3:
-        return delete_by__3.call(this, db, profile_name, success_fn);
+        return delete_by__3.call(this, db, profile_id, success_fn);
     }
     throw new Error("Invalid arity: " + arguments.length);
   };
@@ -40091,9 +40091,29 @@ pult.models.profiles.delete_by = function() {
   delete_by.cljs$core$IFn$_invoke$arity$3 = delete_by__3;
   return delete_by;
 }();
-pult.models.profiles.delete_all = function delete_all(db) {
-  return pult.models.helpers.clear.call(null, db, pult.models.profiles.store_name);
-};
+pult.models.profiles.delete_all = function() {
+  var delete_all = null;
+  var delete_all__1 = function(db) {
+    return delete_all.call(null, function() {
+      return pult.utils.log.call(null, "Deleted all items on ", pult.models.profiles.store_name);
+    });
+  };
+  var delete_all__2 = function(db, success_fn) {
+    return pult.models.helpers.clear.call(null, db, pult.models.profiles.store_name, success_fn);
+  };
+  delete_all = function(db, success_fn) {
+    switch(arguments.length) {
+      case 1:
+        return delete_all__1.call(this, db);
+      case 2:
+        return delete_all__2.call(this, db, success_fn);
+    }
+    throw new Error("Invalid arity: " + arguments.length);
+  };
+  delete_all.cljs$core$IFn$_invoke$arity$1 = delete_all__1;
+  delete_all.cljs$core$IFn$_invoke$arity$2 = delete_all__2;
+  return delete_all;
+}();
 goog.provide("pult.views.settings.mapping_form");
 goog.require("cljs.core");
 goog.require("reagent.cursor");
@@ -53760,65 +53780,65 @@ pult.views.controller.add_ctrl_events = function add_ctrl_events(event_ch, svg_d
     };
   }(ctrl_events);
   console.log("Registering controller events.");
-  var seq__10650 = cljs.core.seq.call(null, ctrl_events);
-  var chunk__10651 = null;
-  var count__10652 = 0;
-  var i__10653 = 0;
+  var seq__10596 = cljs.core.seq.call(null, ctrl_events);
+  var chunk__10597 = null;
+  var count__10598 = 0;
+  var i__10599 = 0;
   while (true) {
-    if (i__10653 < count__10652) {
-      var vec__10654 = cljs.core._nth.call(null, chunk__10651, i__10653);
-      var selector = cljs.core.nth.call(null, vec__10654, 0, null);
-      var action_name = cljs.core.nth.call(null, vec__10654, 1, null);
-      var temp__4124__auto___10656 = pult.utils.by_id.call(null, svg_doc, selector);
-      if (cljs.core.truth_(temp__4124__auto___10656)) {
-        var target_10657 = temp__4124__auto___10656;
-        target_10657.addEventListener(action_name, into_feed);
+    if (i__10599 < count__10598) {
+      var vec__10600 = cljs.core._nth.call(null, chunk__10597, i__10599);
+      var selector = cljs.core.nth.call(null, vec__10600, 0, null);
+      var action_name = cljs.core.nth.call(null, vec__10600, 1, null);
+      var temp__4124__auto___10602 = pult.utils.by_id.call(null, svg_doc, selector);
+      if (cljs.core.truth_(temp__4124__auto___10602)) {
+        var target_10603 = temp__4124__auto___10602;
+        target_10603.addEventListener(action_name, into_feed);
       } else {
         console.error("Failed to register event for:" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(selector) + " , " + cljs.core.str.cljs$core$IFn$_invoke$arity$1(action_name));
       }
-      var G__10658 = seq__10650;
-      var G__10659 = chunk__10651;
-      var G__10660 = count__10652;
-      var G__10661 = i__10653 + 1;
-      seq__10650 = G__10658;
-      chunk__10651 = G__10659;
-      count__10652 = G__10660;
-      i__10653 = G__10661;
+      var G__10604 = seq__10596;
+      var G__10605 = chunk__10597;
+      var G__10606 = count__10598;
+      var G__10607 = i__10599 + 1;
+      seq__10596 = G__10604;
+      chunk__10597 = G__10605;
+      count__10598 = G__10606;
+      i__10599 = G__10607;
       continue;
     } else {
-      var temp__4126__auto__ = cljs.core.seq.call(null, seq__10650);
+      var temp__4126__auto__ = cljs.core.seq.call(null, seq__10596);
       if (temp__4126__auto__) {
-        var seq__10650__$1 = temp__4126__auto__;
-        if (cljs.core.chunked_seq_QMARK_.call(null, seq__10650__$1)) {
-          var c__4410__auto__ = cljs.core.chunk_first.call(null, seq__10650__$1);
-          var G__10662 = cljs.core.chunk_rest.call(null, seq__10650__$1);
-          var G__10663 = c__4410__auto__;
-          var G__10664 = cljs.core.count.call(null, c__4410__auto__);
-          var G__10665 = 0;
-          seq__10650 = G__10662;
-          chunk__10651 = G__10663;
-          count__10652 = G__10664;
-          i__10653 = G__10665;
+        var seq__10596__$1 = temp__4126__auto__;
+        if (cljs.core.chunked_seq_QMARK_.call(null, seq__10596__$1)) {
+          var c__4410__auto__ = cljs.core.chunk_first.call(null, seq__10596__$1);
+          var G__10608 = cljs.core.chunk_rest.call(null, seq__10596__$1);
+          var G__10609 = c__4410__auto__;
+          var G__10610 = cljs.core.count.call(null, c__4410__auto__);
+          var G__10611 = 0;
+          seq__10596 = G__10608;
+          chunk__10597 = G__10609;
+          count__10598 = G__10610;
+          i__10599 = G__10611;
           continue;
         } else {
-          var vec__10655 = cljs.core.first.call(null, seq__10650__$1);
-          var selector = cljs.core.nth.call(null, vec__10655, 0, null);
-          var action_name = cljs.core.nth.call(null, vec__10655, 1, null);
-          var temp__4124__auto___10666 = pult.utils.by_id.call(null, svg_doc, selector);
-          if (cljs.core.truth_(temp__4124__auto___10666)) {
-            var target_10667 = temp__4124__auto___10666;
-            target_10667.addEventListener(action_name, into_feed);
+          var vec__10601 = cljs.core.first.call(null, seq__10596__$1);
+          var selector = cljs.core.nth.call(null, vec__10601, 0, null);
+          var action_name = cljs.core.nth.call(null, vec__10601, 1, null);
+          var temp__4124__auto___10612 = pult.utils.by_id.call(null, svg_doc, selector);
+          if (cljs.core.truth_(temp__4124__auto___10612)) {
+            var target_10613 = temp__4124__auto___10612;
+            target_10613.addEventListener(action_name, into_feed);
           } else {
             console.error("Failed to register event for:" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(selector) + " , " + cljs.core.str.cljs$core$IFn$_invoke$arity$1(action_name));
           }
-          var G__10668 = cljs.core.next.call(null, seq__10650__$1);
-          var G__10669 = null;
-          var G__10670 = 0;
-          var G__10671 = 0;
-          seq__10650 = G__10668;
-          chunk__10651 = G__10669;
-          count__10652 = G__10670;
-          i__10653 = G__10671;
+          var G__10614 = cljs.core.next.call(null, seq__10596__$1);
+          var G__10615 = null;
+          var G__10616 = 0;
+          var G__10617 = 0;
+          seq__10596 = G__10614;
+          chunk__10597 = G__10615;
+          count__10598 = G__10616;
+          i__10599 = G__10617;
           continue;
         }
       } else {
@@ -53844,10 +53864,18 @@ pult.views.controller.mount_ctrl_events = function mount_ctrl_events(event_ch, e
   }], null));
 };
 pult.views.controller.show = function show(event_ch, ctrl_id) {
-  var width = window.screen.width;
-  var height = window.screen.height;
+  var X = window.screen.width;
+  var Y = window.screen.height;
   return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [pult.views.controller.mount_ctrl_events.call(null, event_ch, new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "object", "object", 1474613949), new cljs.core.PersistentArrayMap(null, 5, [new cljs.core.Keyword(null, "id", "id", -1388402092), ctrl_id, new cljs.core.Keyword(null, "type", "type", 1174270348), "image/svg+xml", new cljs.core.Keyword(null, 
-  "data", "data", -232669377), "img/control.svg", new cljs.core.Keyword(null, "width", "width", -384071477), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(width), new cljs.core.Keyword(null, "height", "height", 1025178622), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(height)], null), "Your browser doesnt support SVG!"], null))], null);
+  "data", "data", -232669377), "img/control.svg", new cljs.core.Keyword(null, "width", "width", -384071477), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(function() {
+    var x__3947__auto__ = X;
+    var y__3948__auto__ = Y;
+    return x__3947__auto__ > y__3948__auto__ ? x__3947__auto__ : y__3948__auto__;
+  }()), new cljs.core.Keyword(null, "height", "height", 1025178622), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(function() {
+    var x__3954__auto__ = X;
+    var y__3955__auto__ = Y;
+    return x__3954__auto__ < y__3955__auto__ ? x__3954__auto__ : y__3955__auto__;
+  }())], null), "Your browser doesnt support SVG!"], null))], null);
 };
 pult.views.controller.main = function main(global_app_state) {
   var ctrl_id = "control-object";

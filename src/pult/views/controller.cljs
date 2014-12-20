@@ -55,16 +55,16 @@
 
 (defn show
   [event-ch ctrl-id]
-  (let [width (.-width js/window.screen)
-        height (.-height js/window.screen)]
+  (let [X (.-width js/window.screen)
+        Y (.-height js/window.screen)]
     [(mount-ctrl-events
        event-ch
        [:object
          {:id ctrl-id
           :type "image/svg+xml"
           :data "img/control.svg"
-          :width (str width)
-          :height (str height)}
+          :width (str (max X Y))
+          :height (str (min X Y))}
         "Your browser doesnt support SVG!"])]))
 
 (defn main [global-app-state]

@@ -32,10 +32,11 @@
 (defn delete-by
   ([db profile-id]
     (delete-by db profile-id #(log "Success: deleted profile " (pr-str %))))
-  ([db profile-name success-fn]
+  ([db profile-id success-fn]
     (h/remove-item db store-name profile-id success-fn)))
 
 (defn delete-all
-  [db]
-  (h/clear db store-name))
+  ([db] (delete-all #(log "Deleted all items on " store-name)))
+  ([db success-fn]
+    (h/clear db store-name success-fn)))
 
