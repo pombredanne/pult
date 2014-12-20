@@ -8,19 +8,21 @@
             [pult.models.active-profile :as active-profile-mdl]
             [pult.components.actions.menu :as menu-action]))
 
+;;TODO: should default-profile & supported keys in own module? 
+;;YES - if it's used somewhere else too; currently NO;
 (def default-profile {:id 0 ;should change before saving a new model
                       :name "new"
                       :saved? false
                       :changed? true
                       :description "Please rename before saving!"
-                      :mappings {"btn-up" :UP
-                                 "btn-right" :RIGHT
-                                 "btn-left" :LEFT
-                                 "btn-down" :DOWN
-                                 "btn-a" :A
-                                 "btn-b" :S
-                                 "btn-select" :SHIFT
-                                 "btn-start" :ENTER}})
+                      :mappings {:btn-up    :UP
+                                 :btn-right :RIGHT
+                                 :btn-left  :LEFT
+                                 :btn-down  :DOWN
+                                 :btn-a     :A
+                                 :btn-b     :S
+                                 :btn-select :SHIFT
+                                 :btn-start :ENTER}})
 ;src: https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html
 (def supported-keys [:UP :RIGHT :LEFT :DOWN :SHIFT :ENTER :SPACE :CONTROL
                      :A :B :C :D :E :F :G :H :I :J :K :L :M :N :O :P :Q :R

@@ -4,7 +4,8 @@
   (:require [chord.client :refer [ws-ch]]
             [cljs.core.async :as async
                              :refer [<! >!]]
-            [reagent.core :as reagent :refer [atom cursor]]
+            [reagent.core :as reagent :refer [atom]]
+            [reagent.cursor :refer [cursor]]
             [secretary.core :as secretary]
             [pult.db :as db]
             [pult.routes :as routes]
@@ -12,10 +13,11 @@
             [pult.models.profiles :as profile-mdl]
             [pult.models.active-profile :as active-profile-mdl]
             [pult.utils :refer [current-time by-id by-tag-name
-                                log error locate!]]))
+                                log error locate! vibrate!]]))
 
 ;history item: {:url "" :port "" :path ""}
-
+;;TODO: add schema, specially history&profile items
+;;pult.schemas.profiles/Profile ??
 (defonce app-state (atom {:db {:name "pultdb"
                                :version 1
                                :connection nil}
@@ -26,25 +28,11 @@
                           :incoming-ch (async/chan 5)
                           :outgoing-ch (async/chan (async/sliding-buffer 5))
                           :event-ch (async/chan 10)
-                          ;;TODO: remove it
-                          :mappings {"btn-up" :UP
-                                     "btn-right" :RIGHT
-                                     "btn-left" :LEFT
-                                     "btn-down" :DOWN
-                                     "btn-a" :A
-                                     "btn-b" :S
-                                     "btn-select" :SHIFT
-                                     "btn-start" :ENTER}
                           :profiles {:active nil
                                      :editing nil
-                                     :items {}
+                                     :items {} ;settings.mapping-form/default-profile
                                      :active-history []}
                           }))
-
-;;-- helpers
-(defn vibrate!
-  [duration]
-  (.vibrate js/navigator duration))
 
 ;;-- message handlers
 (defn listen-messages
@@ -95,6 +83,7 @@
   (stop-messenger)
   (locate! "#connection"))
 
+;;TODO: refactor show-error into own component with function close button&timeout
 (defn connect
   [conn-dt]
   (let [{:keys [url port path]} (:data conn-dt)
@@ -155,26 +144,51 @@
 (defmethod event->action :default [ev]
   (.error js/console "Unknown event - cant translate it to action." ev))
 
+
+(defmulti on-special-key identity)
+
+(defmethod on-special-key "btn-configure" [btn-id]
+  (log "Showing pult settings")
+  (locate! "#settings"))
+
+(defmethod on-special-key "btn-connect" [btn-id]
+  (log "Showing connection form")
+  ;TODO: add disconnect
+  (locate! "#connection"))
+
+(defmethod on-special-key :default [btn-id]
+  (error "on-special-key: unknown dispatch value - " (pr-str btn-id)))
+
+
+;;TODO replace mapping with active mapping
 (defn send-actions
   "listen controller actions on event channel and sends it to the server"
   [outgoing-ch event-feed source-id]
-  (let [ctrl-ch (async/chan (async/sliding-buffer 5))]
+  (let [ctrl-ch (async/chan (async/sliding-buffer 5))
+        profiles-cur (cursor [:profiles :items] app-state)]
     (async/sub event-feed source-id ctrl-ch)
     (log "Listening controller events ...")
     (go-loop []
       (when-let [dt (<! ctrl-ch)]
-        (let [duration (:duration @app-state)
-              btn-id (.. (:event dt) -target -id)
-              btn-code (get-in @app-state [:mappings btn-id] :not-mapped)]
-          (some->>
-                (:event dt)
-                event->action
-                (merge {:id :command
-                        :key btn-code
-                        :start (current-time)})
-                (async/put! outgoing-ch))
-          (vibrate! duration)
-          (recur))))))
+        (let [btn-id (.. (:event dt) -target -id)
+              special-ids #{"btn-configure" "btn-connect"}
+              active-profile-id (long (get-in @app-state [:profiles :active]))
+              btn-code (get-in @profiles-cur
+                               [active-profile-id :mappings (keyword btn-id)]
+                               :UNDEFINED)]
+          ;(log " btn=id: " btn-id " -> " btn-code)
+          (if (contains? special-ids btn-id)
+            (on-special-key btn-id) ;special key = dont send it to server
+            (some->>
+                  (:event dt)
+                  event->action
+                  (merge {:id :command
+                          :key btn-code
+                          :start (current-time)})
+                  (async/put! outgoing-ch)))
+          (vibrate! 20)
+          (recur))))
+    (log "Stopped listening controller actions.")))
 
 (defn start-db
   "create db connection and after successful attempt loads initial data into
@@ -206,9 +220,9 @@
       (fn [conn]
         (.log js/console "Database is now connected.")
         (swap! db #(assoc % :connection conn))
-        (history-mdl/get-n-latest db 10 #(reset! history %))
+        (history-mdl/get-n-latest db 7 #(reset! history %))
         (profile-mdl/get-all db (partial add-profiles profiles))
-        (active-profile-mdl/get-n-latest db 10 (partial add-active-profiles app-state))
+        (active-profile-mdl/get-n-latest db 7 (partial add-active-profiles app-state))
         ))))
 
 (defn ^:export main []

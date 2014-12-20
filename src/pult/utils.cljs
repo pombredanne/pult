@@ -37,3 +37,10 @@
 (defn error [& msgs]
   (.error js/console (apply str msgs)))
 
+
+;;-- API helpers
+(defn vibrate!
+  [duration]
+  (.vibrate js/navigator duration))
+
+

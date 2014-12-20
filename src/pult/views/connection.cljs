@@ -76,6 +76,7 @@
        [:div {:class "pure-menu pure-menu-open"}
          [:ul
           (for [item @history]
+            ^{:key (str (:url item) "/" (:path item) ":" (rand-int 1000) )}
             [:li
               [:a {:href "#" :class ""
                    :on-click (fn [ev]
