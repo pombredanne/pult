@@ -11,7 +11,9 @@
   ([db profile-dt success-fn]
     (h/add db
            store-name
-           {:timestamp (current-time) :name (:name profile-dt)}
+           {:timestamp (current-time)
+            :id (:id profile-dt)
+            :name (:name profile-dt)}
            success-fn)))
 
 (defn get-by

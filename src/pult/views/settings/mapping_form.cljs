@@ -1,13 +1,15 @@
 (ns pult.views.settings.mapping-form
   (:refer-clojure :exclude [atom])
-  (:require [reagent.core :as reagent :refer [cursor atom]]
+  (:require [reagent.core :as reagent :refer [atom]]
+            [reagent.cursor :refer [cursor]]
             [secretary.core :as secretary]
             [pult.utils :refer [current-time log error]]
             [pult.models.profiles :as profile-mdl]
             [pult.models.active-profile :as active-profile-mdl]
             [pult.components.actions.menu :as menu-action]))
 
-(def default-profile {:name "new"
+(def default-profile {:id 0 ;should change before saving a new model
+                      :name "new"
                       :saved? false
                       :changed? true
                       :description "Please rename before saving!"
@@ -44,7 +46,7 @@
       [:div
         {:class "pure-control-group"}
         [:label {:for "selector"}
-          (str (name btn-value) ": ")]
+          (str btn-id " ")]
         [:select
           {:id (str btn-id)
            :name (str btn-id)
@@ -68,8 +70,6 @@
                              (let [key-val (-> ev .-target .-value keyword)
                                    reserved-vals (-> @profile-cur :mappings vals set)
                                    not-used? #(not (contains? %1 %2))]
-                               (log "reserved-vals: " (pr-str reserved-vals))
-                               (log "key-val: " (pr-str key-val))
                                (or
                                  (= old-val key-val)
                                  (not-used? reserved-vals key-val))))
@@ -87,14 +87,25 @@
                                    (assoc xs
                                           :changed? true
                                           input-id (-> ev .-target .-value)))))
-        on-save (fn [profile-cur profile-id ev]
-                  (let [new-profile (assoc @profile-cur :saved? true :changed? false)]
+        on-save (fn [profile-cur ev]
+                  (let [profile @profile-cur
+                        profile-id (if (and
+                                          (:saved? profile)
+                                          (pos? (get profile :id 0)))
+                                      (long (:id @profile-cur))
+                                      (current-time))
+                        new-profile (assoc profile
+                                           :saved? true
+                                           :changed? false
+                                           :id profile-id)]
                     (.preventDefault ev) ; dont fire FORM submit event
+                    (log "Saving profile:" profile-id ":" (:name profile))
+                    (swap! profiles-cur
+                           #(assoc-in % [:items profile-id] new-profile))
                     (profile-mdl/upsert
                       db new-profile
                       (fn [row]
-                        (log "Saved new item: " (pr-str row))
-                        (reset! profile-cur new-profile)))))]
+                        (log "Saved new item: " (pr-str new-profile))))))]
     [:div {:class "pure-u-1"}
       [:form {:class "pure-form pure-form-stacked"}
         [:fieldset {:class "pure-group"}
@@ -129,7 +140,7 @@
           ;;TODO: does it updates already existing profile?
           [:button {:class "pure-button pure-button-primary pure-input-1"
                     :style {:display (if (:changed? @profile) "block" "none")}
-                    :on-click (partial on-save profile profile-id)}
+                    :on-click (partial on-save profile)}
            [:span [:i {:class "fa fa-save"} " "] "Save"]]]]))
 
 (defn profile-controls
@@ -147,18 +158,18 @@
                                   :items (dissoc (:items xs) profile-id))))
         on-activate (fn [db profiles-cur profile-id ev]
                       (let [cur profiles-cur
-                            others (remove #(= profile-id (:name %))
+                            others (remove #(= profile-id (:id %))
                                            (:items @profiles-cur))
                             next-profile (first others)]
-                        (.log js/console (str "Deactivated profile: " profile-id))
+                        (log (str "Deactivated profile: " profile-id))
                         (active-profile-mdl/add db next-profile)
-                        (swap! profiles-cur #(assoc % :active (:name next-profile)))))]
+                        (swap! profiles-cur #(assoc % :active (:id next-profile)))))]
     [:div {:class "profile-controls"
            :style {:display (if (:saved? @profile) "block" "none")}}
       [:button
         {:class "pure-button button-secondary pure-u-1-3"
          :on-click (fn [ev]
-                     (.log js/console "Deleting mappings profile: " profile-id)
+                     (log "Deleting mappings profile: " profile-id)
                      (profile-mdl/delete-by db
                                             profile-id
                                             (fn [res]
@@ -170,13 +181,14 @@
       [:button
         {:class "pure-button button-secondary pure-u-1-3"
          :on-click (fn [ev]
-                     (log "Cloning profile: " profile-id)
                      (let [new-name (str (:name @profile) "_copy_" (current-time))
+                           new-id (current-time)
                            new-profile (assoc @profile
                                               :name new-name
-                                              :saved? false
-                                              :changed? true)]
-                       (swap! profiles-cur #(assoc-in % [:items new-name] new-profile))
+                                              :id new-id
+                                              :saved? true
+                                              :changed? false)]
+                       (swap! profiles-cur #(assoc-in % [:items new-id] new-profile))
                        (secretary/dispatch! (str "/settings/mappings/" new-name))))}
         [:i {:class "fa fa-copy"} " "] " Clone"]
 
@@ -198,10 +210,14 @@
   [app-state]
   (let [db (cursor [:db] app-state)
         profiles-cur (cursor [:profiles] app-state)
-        profile-id (:editing @profiles-cur)]
+        profile-id (long (:editing @profiles-cur))
+        profile-cur (cursor [:profiles :items profile-id] app-state)]
     [:div {:class "pure-u-1"}
      (menu-action/render
-       [:h3 (str "Profile: " profile-id)]
+       [:h3 {:data-profile-id profile-id}
+            (str "Profile: " (:name @profile-cur)
+                 (when-not (:saved? @profile-cur) " - unsaved")
+                 (when (:changed? @profile-cur) "- unsaved"))]
        "#settings/mappings"
        [:div {:class "pure-u-1"}
         (profile-controls db profiles-cur profile-id)

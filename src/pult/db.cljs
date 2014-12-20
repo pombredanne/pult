@@ -19,11 +19,16 @@
     (idx/create-index "timeIndex" "timestamp" {:unique true}))
   (-> db-tx
       (idx/create-store "profiles" {:keyPath "name"})
-      (idx/create-index "nameIndex" "name" {:unique true}))
+      (idx/create-index "idIndex" "id" {:unique true}))
   (-> db-tx
       (idx/create-store "profile-history" {:keyPath "timestamp"})
       (idx/create-index "timeIndex" "timestamp" {:unique true}))
   (insert-seed-data! db-tx))
+
+(defn delete-all
+  [db-tx]
+  (.log js/console "Deleting db")
+  (.deleteDatabase js/indexedDB db-name))
 
 (defn connect
   "initializes a new db connection

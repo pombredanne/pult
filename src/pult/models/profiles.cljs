@@ -3,7 +3,7 @@
             [pult.models.helpers :as h]))
 
 (def store-name "profiles")
-(def store-index "nameIndex")
+(def store-index "idIndex")
 
 ;;TODO: add profile schema
 (defn add
@@ -30,12 +30,12 @@
   (h/get-all db store-name 0 success-fn))
 
 (defn delete-by
-  ([db profile-name]
-    (delete-by db profile-name #(log "Success: deleted profile " (pr-str %))))
+  ([db profile-id]
+    (delete-by db profile-id #(log "Success: deleted profile " (pr-str %))))
   ([db profile-name success-fn]
-    (h/remove-item db store-name profile-name success-fn)))
+    (h/remove-item db store-name profile-id success-fn)))
 
 (defn delete-all
   [db]
-  (h/delete-store db store-name))
+  (h/clear db store-name))
 

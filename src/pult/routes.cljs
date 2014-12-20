@@ -36,14 +36,15 @@
     (reagent/render-component [#(mapping-view/render app-state)]
                               (by-id "app-container")))
 
-  (defroute mappings-form-path "/settings/mappings/:id" {profile-id :id}
-    (.log js/console "Showing mapping editor for: " profile-id)
-    (if (= "new" profile-id)
-      (swap! app-state
-             #(assoc-in % [:profiles :items "new"] mapping-form/default-profile)))
-    (swap! app-state (fn [xs] (assoc-in xs [:profiles :editing] profile-id)))
-    (reagent/render-component [#(mapping-form/render app-state)]
-                              (by-id "app-container"))))
+  (defroute mappings-form-path "/settings/mappings/:id" {id :id}
+    (let [profile-id (long id)]
+      (.log js/console "Showing mapping editor for: " profile-id)
+      (if (= 0 profile-id)
+        (swap! app-state
+               #(assoc-in % [:profiles :items profile-id] mapping-form/default-profile)))
+      (swap! app-state (fn [xs] (assoc-in xs [:profiles :editing] profile-id)))
+      (reagent/render-component [#(mapping-form/render app-state)]
+                                (by-id "app-container")))))
 
 (defn mount
   [app-state]

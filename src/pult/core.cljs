@@ -5,6 +5,7 @@
             [cljs.core.async :as async
                              :refer [<! >!]]
             [reagent.core :as reagent :refer [atom cursor]]
+            [secretary.core :as secretary]
             [pult.db :as db]
             [pult.routes :as routes]
             [pult.models.history :as history-mdl]
@@ -62,8 +63,8 @@
     (when-let [{:keys [message error]} (<! incoming-ch)]
       (if message
         (when (= :command (:id message))
-          (.debug js/console "Lag: " (- (current-time) (:start message))))
-        (.debug js/console "Got error: " message))
+          (log "feedback lag: " (- (current-time) (:start message))))
+        (error "Got error: " message))
       (recur))))
 
 (defn start-messenger
@@ -74,14 +75,14 @@
           outgoing-ch (:outgoing-ch @app-state)]
       (if error
         (do
-          (.error js/console "Cant open connection with the server." (pr-str error))
+          (error "Cant open connection with the server." (pr-str error))
           false)
         (do
           (swap! app-state (fn [xs] (assoc-in xs [:connection :socket] ws-channel)))
           (listen-messages ws-channel incoming-ch)
           (send-messages ws-channel outgoing-ch)
           (handle-received-messages incoming-ch)
-          (.debug js/console "Connection opened successfully.")
+          (log "Connection opened successfully.")
           true)))))
 
 (defn stop-messenger
@@ -91,7 +92,7 @@
 ;;TODO: refactor
 (defn on-disconnect
   [ev]
-  (.debug js/console "Closing connection.")
+  (log "Closing connection.")
   (stop-messenger)
   ;(hide-by-id! "controller")
   ;(show-by-id! "connection")
@@ -99,7 +100,6 @@
 
 (defn connect
   [conn-dt]
-  (.debug js/console "on connection")
   (let [{:keys [url port path]} (:data conn-dt)
         show-error (fn [id msg]
                      (set! (.-innerHTML (by-id id))
@@ -109,19 +109,19 @@
     (go
       (if-let [succ (<! (start-messenger uri {:format :edn}))]
         (do
-          (.debug js/console "Connection success.")
+          (log "Connection success.")
           (swap! app-state (fn [xs] (assoc-in xs [:connection :uri] uri)))
           (hide-by-id! "connection")
           (show-by-id! "controller"))
         (do
-          (.debug js/console "Connection failure.")
+          (error "Connection failure.")
           (show-error "connection-msg" "Connection failure!"))))))
 
 (defn on-connect
   "listen connection event on event-feed"
   [event-feed source-id]
   (let [data-ch (async/chan 1)]
-    (.debug js/console "Waiting connection data.")
+    (log "Waiting connection data.")
     (async/sub event-feed source-id data-ch)
     (go-loop []
       (when-let [conn-dt (<! data-ch)]
@@ -164,13 +164,12 @@
   [outgoing-ch event-feed source-id]
   (let [ctrl-ch (async/chan (async/sliding-buffer 5))]
     (async/sub event-feed source-id ctrl-ch)
-    (.debug js/console "Listening controller events ...")
+    (log "Listening controller events ...")
     (go-loop []
       (when-let [dt (<! ctrl-ch)]
         (let [duration (:duration @app-state)
               btn-id (.. (:event dt) -target -id)
               btn-code (get-in @app-state [:mappings btn-id] :not-mapped)]
-          (.debug js/console (:event dt))
           (some->>
                 (:event dt)
                 event->action
@@ -197,15 +196,14 @@
         add-profiles (fn [profiles-cur rows]
                         (reset! profiles-cur
                                (->> rows
-                                  (map (fn [row] [(:name row) row]))
+                                  (map (fn [row] [(:id row) row])) ;index-table
                                   (map (fn [[k v]] [k (keywordize-keys v)]))
                                   (into {}))))
         add-active-profiles (fn [app-state rows]
-                              (log "Active profiles: " (pr-str rows))
                               (swap! app-state
                                      (fn [xs]
                                        (-> xs
-                                       (assoc-in [:profiles :active] (-> rows first :name))
+                                       (assoc-in [:profiles :active] (-> rows first :id long))
                                        (assoc-in [:profiles :active-history] (vec rows))))))]
     (db/connect
       db
