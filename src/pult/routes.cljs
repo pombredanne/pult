@@ -38,6 +38,9 @@
 
   (defroute mappings-form-path "/settings/mappings/:id" {profile-id :id}
     (.log js/console "Showing mapping editor for: " profile-id)
+    (if (= "new" profile-id)
+      (swap! app-state
+             #(assoc-in % [:profiles :items "new"] mapping-form/default-profile)))
     (swap! app-state (fn [xs] (assoc-in xs [:profiles :editing] profile-id)))
     (reagent/render-component [#(mapping-form/render app-state)]
                               (by-id "app-container"))))

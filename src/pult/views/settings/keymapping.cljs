@@ -20,5 +20,5 @@
           (vec (map
                  (fn [{:keys [name]}]
                    [(str "#settings/mappings/" name) name (= name active-profile-id)])
-                 (:items @profiles-cur))))])))
+                 (vals (:items @profiles-cur)))))])))
 

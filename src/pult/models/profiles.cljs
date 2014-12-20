@@ -1,0 +1,41 @@
+(ns pult.models.profiles
+  (:require [pult.utils :refer [current-time log error]]
+            [pult.models.helpers :as h]))
+
+(def store-name "profiles")
+(def store-index "nameIndex")
+
+;;TODO: add profile schema
+(defn add
+  ([db profile-dt]
+    (add db profile-dt #(log "Added new profile:" (pr-str %))))
+  ([db profile-dt success-fn]
+    (h/add db store-name profile-dt success-fn)))
+
+(defn upsert
+  ([db profile-dt]
+    (upsert db profile-dt #(log "Upserted profile" (pr-str %))))
+  ([db profile-dt success-fn]
+    (h/upsert db store-name profile-dt success-fn)))
+
+(defn get-by
+  ([db profile-name]
+    (get-by db profile-name #(log "Got: " (pr-str %))))
+  ([db profile-name success-fn]
+    (h/get-by db store-name store-index profile-name success-fn)))
+
+(defn get-all
+  "returns a list of profiles"
+  [db success-fn]
+  (h/get-all db store-name 0 success-fn))
+
+(defn delete-by
+  ([db profile-name]
+    (delete-by db profile-name #(log "Success: deleted profile " (pr-str %))))
+  ([db profile-name success-fn]
+    (h/remove-item db store-name profile-name success-fn)))
+
+(defn delete-all
+  [db]
+  (h/delete-store db store-name))
+

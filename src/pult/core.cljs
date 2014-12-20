@@ -8,8 +8,10 @@
             [pult.db :as db]
             [pult.routes :as routes]
             [pult.models.history :as history-mdl]
+            [pult.models.profiles :as profile-mdl]
+            [pult.models.active-profile :as active-profile-mdl]
             [pult.utils :refer [current-time by-id by-tag-name
-                                hide-by-id! show-by-id!]]
+                                hide-by-id! show-by-id! log error]]
             ))
 
 ;history item: {:url "" :port "" :path ""}
@@ -24,6 +26,7 @@
                           :incoming-ch (async/chan 5)
                           :outgoing-ch (async/chan (async/sliding-buffer 5))
                           :event-ch (async/chan 10)
+                          ;;TODO: remove it
                           :mappings {"btn-up" :UP
                                      "btn-right" :RIGHT
                                      "btn-left" :LEFT
@@ -34,9 +37,8 @@
                                      "btn-start" :ENTER}
                           :profiles {:active nil
                                      :editing nil
-                                     :items [{:name "mock1"
-                                              :description "just plain mock"
-                                              :mappings {"btn-up" :UP}}]}
+                                     :items {}
+                                     :active-history []}
                           }))
 
 ;;-- helpers
@@ -86,12 +88,14 @@
   []
   (swap! app-state (fn [xs] (assoc-in xs [:connection :socket] nil))))
 
+;;TODO: refactor
 (defn on-disconnect
   [ev]
   (.debug js/console "Closing connection.")
   (stop-messenger)
-  (hide-by-id! "controller")
-  (show-by-id! "connection"))
+  ;(hide-by-id! "controller")
+  ;(show-by-id! "connection")
+  (secretary/dispatch! "/connection"))
 
 (defn connect
   [conn-dt]
@@ -178,15 +182,40 @@
           (recur))))))
 
 (defn start-db
+  "create db connection and after successful attempt loads initial data into
+  global app-state;"
   [app-state]
   (let [db (cursor [:db] app-state)
-        history (cursor [:connection :history] app-state)]
+        history (cursor [:connection :history] app-state)
+        profiles (cursor [:profiles :items] app-state)
+        keywordize-keys (fn [profile]
+                          ;cljs-idx dont restore saved keywords as keys
+                          (assoc profile
+                                 :mappings (->> (:mappings profile)
+                                          (map (fn [[k v]] [k (keyword v)]))
+                                          (into {}))))
+        add-profiles (fn [profiles-cur rows]
+                        (reset! profiles-cur
+                               (->> rows
+                                  (map (fn [row] [(:name row) row]))
+                                  (map (fn [[k v]] [k (keywordize-keys v)]))
+                                  (into {}))))
+        add-active-profiles (fn [app-state rows]
+                              (log "Active profiles: " (pr-str rows))
+                              (swap! app-state
+                                     (fn [xs]
+                                       (-> xs
+                                       (assoc-in [:profiles :active] (-> rows first :name))
+                                       (assoc-in [:profiles :active-history] (vec rows))))))]
     (db/connect
       db
       (fn [conn]
         (.log js/console "Database is now connected.")
         (swap! db #(assoc % :connection conn))
-        (history-mdl/get-n-latest db 10 #(reset! history %))))))
+        (history-mdl/get-n-latest db 10 #(reset! history %))
+        (profile-mdl/get-all db (partial add-profiles profiles))
+        (active-profile-mdl/get-n-latest db 10 (partial add-active-profiles app-state))
+        ))))
 
 (defn ^:export main []
   (let [outgoing-ch (:outgoing-ch @app-state)

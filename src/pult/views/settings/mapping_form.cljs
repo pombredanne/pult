@@ -1,12 +1,16 @@
 (ns pult.views.settings.mapping-form
-  (:require [reagent.core :as reagent :refer [cursor]]
+  (:refer-clojure :exclude [atom])
+  (:require [reagent.core :as reagent :refer [cursor atom]]
             [secretary.core :as secretary]
-            [pult.utils :refer [current-time]]
+            [pult.utils :refer [current-time log error]]
+            [pult.models.profiles :as profile-mdl]
+            [pult.models.active-profile :as active-profile-mdl]
             [pult.components.actions.menu :as menu-action]))
 
 (def default-profile {:name "new"
-                      :saved false
-                      :description "Default OpenEMU binding for NES."
+                      :saved? false
+                      :changed? true
+                      :description "Please rename before saving!"
                       :mappings {"btn-up" :UP
                                  "btn-right" :RIGHT
                                  "btn-left" :LEFT
@@ -27,32 +31,70 @@
       ^{:key (str key-code)} [:option {:value key-code} (name key-code)])])
 
 (defn button-selector
-  [btn-id btn-value]
-  ^{:key btn-id} [:div
-    {:class "pure-control-group"}
-    [:label {:for "selector"}
-      (str (name btn-value) ": ")]
-    [:select
-      {:id (str btn-id)
-       :name (str btn-id)
-       :class "pure-input-1"
-       :defaultValue btn-value
-       ;;TODO: check key is not already in use
-       ;;TODO: update value after change ...
-       :on-change #(.log js/console (str "Changed " btn-id))}
-      (supported-keys-options)]])
-
-(defn get-profile
-  [profiles profile-id]
-  (let [res (filter #(= profile-id (:name %1)) profiles)]
-    (if (empty? res)
-      default-profile
-      (first res))))
+  [btn-id btn-value on-change-fn validator-fn]
+  (let [validation-error (atom nil)
+        on-validation-error (fn [ev]
+                              (let [new-key (-> ev .-target .-value)
+                                    error-msg (str "Cant use the key "
+                                                   "`"  new-key "`"
+                                                   "- already in use")]
+                                (error error-msg)
+                                (reset! validation-error error-msg)))]
+    (fn []
+      [:div
+        {:class "pure-control-group"}
+        [:label {:for "selector"}
+          (str (name btn-value) ": ")]
+        [:select
+          {:id (str btn-id)
+           :name (str btn-id)
+           :class "pure-input-1"
+           :defaultValue btn-value
+           :on-change (fn [ev]
+                        (if (true? (validator-fn ev))
+                          (on-change-fn ev)
+                          (on-validation-error ev)))}
+          (supported-keys-options)]
+        ;--show validation errors when validator-fn fails
+        [:div {:class "pure-alert pure-error"
+               :style {:display (if (nil? @validation-error) "none" "block")}}
+         [:p (str @validation-error)]]])))
 
 (defn profile-form
-  [profile-cur profile-id]
-  (let [profile (get-profile (:items @profile-cur) profile-id)]
-    (.log js/console (str "Profile-form: " (pr-str profile)))
+  [db profiles-cur profile-id]
+  (let [profile (cursor [:items profile-id] profiles-cur)
+        selector-validator (fn [profile-cur old-val ev]
+                             ;returns false if didnt pass validation
+                             (let [key-val (-> ev .-target .-value keyword)
+                                   reserved-vals (-> @profile-cur :mappings vals set)
+                                   not-used? #(not (contains? %1 %2))]
+                               (log "reserved-vals: " (pr-str reserved-vals))
+                               (log "key-val: " (pr-str key-val))
+                               (or
+                                 (= old-val key-val)
+                                 (not-used? reserved-vals key-val))))
+        on-selector-change (fn [profile-cur key-id ev]
+                             (let [new-key-val (-> ev .-target .-value keyword)]
+                               (log "Updating selector value to: " new-key-val)
+                               (swap! profile-cur
+                                      (fn [xs]
+                                        (-> xs
+                                          (assoc :changed? true)
+                                          (assoc-in [:mappings key-id] new-key-val))))))
+        on-input-change (fn [profile-cur input-id ev]
+                          (swap! profile-cur
+                                 (fn [xs]
+                                   (assoc xs
+                                          :changed? true
+                                          input-id (-> ev .-target .-value)))))
+        on-save (fn [profile-cur profile-id ev]
+                  (let [new-profile (assoc @profile-cur :saved? true :changed? false)]
+                    (.preventDefault ev) ; dont fire FORM submit event
+                    (profile-mdl/upsert
+                      db new-profile
+                      (fn [row]
+                        (log "Saved new item: " (pr-str row))
+                        (reset! profile-cur new-profile)))))]
     [:div {:class "pure-u-1"}
       [:form {:class "pure-form pure-form-stacked"}
         [:fieldset {:class "pure-group"}
@@ -65,91 +107,103 @@
                :type "text"
                :class "pure-input-1 pure-input-lg-1-2 pure-input-md-1-2"
                :placeholder "Profile name"
-               :defaultValue (:name profile)
-               :on-change (fn [e]
-                            (swap! profile
-                                   #(assoc % :name (-> e .-target .-value))))}]]
+               :defaultValue (:name @profile)
+               :on-change (partial on-input-change profile :name)}]]
           [:div {:class "pure-control-group"}
             [:label {:for "description"} "Description: "]
             [:textarea
               {:type "text"
                :class "pure-input-1"
-               :defaultValue (:description profile)
-               :placeholder "Profile description"}]]]
+               :defaultValue (:description @profile)
+               :placeholder "Profile description"
+               :on-change (partial on-input-change profile :description)}]]]
 
         [:fieldset
           {:class "pure-group"}
           [:legend [:strong "Controller keys"]]
-          (for [[k v] (:mappings profile)]
-            (button-selector k v))]
-          ;;TODO: finish functionality
-          [:button {:class "pure-button pure-button-primary pure-input-1"}  "Save"]
-        ]]))
+          (for [[k v] (:mappings @profile)]
+            ^{:key (str k "_" v)} ;required meta-data for React
+            [(button-selector k v
+                             (partial on-selector-change profile k)
+                             (partial selector-validator profile v))])]
+          ;;TODO: does it updates already existing profile?
+          [:button {:class "pure-button pure-button-primary pure-input-1"
+                    :style {:display (if (:changed? @profile) "block" "none")}
+                    :on-click (partial on-save profile profile-id)}
+           [:span [:i {:class "fa fa-save"} " "] "Save"]]]]))
 
 (defn profile-controls
-  [profiles-cur profile-id]
-  (let [active? (= profile-id (:active @profiles-cur))]
-    [:div {:class "profile-controls"}
+  [db profiles-cur profile-id]
+  (let [active? (= profile-id (:active @profiles-cur))
+        profile (cursor [:items profile-id] profiles-cur)
+        remove-profile (fn [xs]
+                         (let [other-keys (remove #(= profile-id %)
+                                                  (keys (:items @profiles-cur)))]
+                           (assoc xs
+                                  :editing nil
+                                  :active (if (= profile-id (:active xs))
+                                            ((comp first keys) other-keys)
+                                            (:active xs))
+                                  :items (dissoc (:items xs) profile-id))))
+        on-activate (fn [db profiles-cur profile-id ev]
+                      (let [cur profiles-cur
+                            others (remove #(= profile-id (:name %))
+                                           (:items @profiles-cur))
+                            next-profile (first others)]
+                        (.log js/console (str "Deactivated profile: " profile-id))
+                        (active-profile-mdl/add db next-profile)
+                        (swap! profiles-cur #(assoc % :active (:name next-profile)))))]
+    [:div {:class "profile-controls"
+           :style {:display (if (:saved? @profile) "block" "none")}}
       [:button
         {:class "pure-button button-secondary pure-u-1-3"
          :on-click (fn [ev]
-                     (.log js/console "Deleted mappings profile: " profile-id)
-                     (swap! profiles-cur
-                            (fn [xs]
-                              (assoc xs
-                                     :editing nil
-                                     ;;if user deleted active profile
-                                     :active (if active?
-                                               ((comp :name first :items) xs)
-                                               (:active xs))
-                                     :items (vec (remove #(= profile-id (:name %)) (:items xs))))))
-                     (secretary/dispatch! "/mappings"))}
-        [:i {:class "fa fa-trash"} " "] "Delete"]
+                     (.log js/console "Deleting mappings profile: " profile-id)
+                     (profile-mdl/delete-by db
+                                            profile-id
+                                            (fn [res]
+                                              (log "deleted profile: " profile-id)
+                                              (swap! profiles-cur remove-profile)
+                                              (secretary/dispatch! "/settings/mappings"))))}
+        [:i {:class "fa fa-trash"} " "] " Delete"]
+
       [:button
         {:class "pure-button button-secondary pure-u-1-3"
          :on-click (fn [ev]
-                     ;;TODO: add DB persistance
-                     (.log js/console "user clones profile: " profile-id)
-                     (let [items (:items @profiles-cur)
-                           profile (get-profile items profile-id)
-                           new-profile (assoc profile :name (str (:name profile)
-                                                                 "_copy_"
-                                                                 (current-time)))]
-                       (swap! profiles-cur
-                              (fn [xs]
-                                (assoc xs :items (vec (cons new-profile (:items xs))))))
-                       (secretary/dispatch! (str "/mappings/" (:name new-profile)))))}
-        [:i {:class "fa fa-copy"} " "] "Clone"]
+                     (log "Cloning profile: " profile-id)
+                     (let [new-name (str (:name @profile) "_copy_" (current-time))
+                           new-profile (assoc @profile
+                                              :name new-name
+                                              :saved? false
+                                              :changed? true)]
+                       (swap! profiles-cur #(assoc-in % [:items new-name] new-profile))
+                       (secretary/dispatch! (str "/settings/mappings/" new-name))))}
+        [:i {:class "fa fa-copy"} " "] " Clone"]
+
         [:button
          {:class "pure-button button-success pure-u-1-3"
           :style {:display (if active? "inline-block" "none")}
-          ;;TODO: add DB persistance
-          :on-click (fn [ev]
-                      (let [cur profiles-cur
-                            items (:items @cur)
-                            others (remove #(= profile-id (:name %)) items)]
-                        (.log js/console (str "Deactivated profile: " profile-id))
-                        (swap! profiles-cur
-                               (fn [xs]
-                                 (assoc xs :active ((comp :name first) others))))))}
+          :on-click (partial on-activate db profiles-cur profile-id)}
          [:i {:class "fa fa-power-off"} " "] "Deactivate"]
         [:button
           {:class "pure-button button-secondary pure-u-1-3"
            :style {:display (if active? "none" "inline-block")}
            :on-click (fn [ev]
                       (.log js/console "User activated profile: " profile-id)
+                      (active-profile-mdl/add db @profile)
                       (swap! profiles-cur (fn [xs] (assoc xs :active profile-id))))}
           [:i {:class "fa fa-power-off"} " "] "Activate"]]))
 
 (defn render
   [app-state]
-  (let [profiles-cur (cursor [:profiles] app-state)
+  (let [db (cursor [:db] app-state)
+        profiles-cur (cursor [:profiles] app-state)
         profile-id (:editing @profiles-cur)]
     [:div {:class "pure-u-1"}
      (menu-action/render
        [:h3 (str "Profile: " profile-id)]
        "#settings/mappings"
        [:div {:class "pure-u-1"}
-        (profile-controls profiles-cur profile-id)
-        (profile-form profiles-cur profile-id)])]
-    ))
+        (profile-controls db profiles-cur profile-id)
+        (profile-form db profiles-cur profile-id)])]))
+
