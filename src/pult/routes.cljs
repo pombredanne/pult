@@ -5,6 +5,7 @@
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [pult.utils :refer [by-id locate!]]
+            [pult.models.profiles :as profile-mdl]
             [pult.views.connection :as conn-app]
             [pult.views.controller :as ctrl-app]
             [pult.views.settings.core :as settings-view]
@@ -41,7 +42,7 @@
       (.log js/console "Showing mapping editor for: " profile-id)
       (if (= 0 profile-id)
         (swap! app-state
-               #(assoc-in % [:profiles :items profile-id] mapping-form/default-profile)))
+               #(assoc-in % [:profiles :items profile-id] profile-mdl/default-profile)))
       (swap! app-state (fn [xs] (assoc-in xs [:profiles :editing] profile-id)))
       (reagent/render-component [#(mapping-form/render app-state)]
                                 (by-id "app-container")))))

@@ -30,7 +30,7 @@
                           :event-ch (async/chan 10)
                           :profiles {:active nil
                                      :editing nil
-                                     :items {} ;settings.mapping-form/default-profile
+                                     :items {} ;profile-mdl/default-profile
                                      :active-history []}
                           }))
 
@@ -91,7 +91,7 @@
                      (set! (.-innerHTML (by-id id))
                            (str "<p style = \"background-color: orange;\" >" msg "</p>")))
         uri (str "ws://" url ":" port "/" path)]
-    (vibrate! 20)
+    (vibrate! 10)
     (go
       (if-let [succ (<! (start-messenger uri {:format :edn}))]
         (do

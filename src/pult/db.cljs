@@ -1,15 +1,26 @@
 (ns pult.db
-  (:require [cljs-idxdb.core :as idx]))
+  (:require [cljs-idxdb.core :as idx]
+            [pult.utils :refer [log error current-time]]
+            [pult.models.profiles :as profile-mdl]
+            [pult.models.active-profile :as active-profile-mdl]))
 
 (def db-name "pultdb")
 (def db-version 1)
 
-
 ;var request = window.indexedDB.deleteDatabase("pultDB");
 (defn insert-seed-data!
-  [db-tx]
+  [db-conn]
   (.log js/console "Inserting seed data..")
-  db-tx)
+  (let [new-id (long (current-time))
+        db {:connection db-conn}
+        default-profile (profile-mdl/create {:saved? true
+                                             :changed? false
+                                             :id new-id
+                                             :name "NES_remote1"
+                                             :description "default NES bindings on OpenEmu"})]
+    (profile-mdl/add db default-profile)
+    (active-profile-mdl/add db {:id new-id :name "NES_remote1"})
+    db-conn))
 
 (defn run-migrations!
   [db-tx]
