@@ -4,7 +4,7 @@
             [reagent.core :as reagent]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
-            [pult.utils :refer [by-id]]
+            [pult.utils :refer [by-id locate!]]
             [pult.views.connection :as conn-app]
             [pult.views.controller :as ctrl-app]
             [pult.views.settings.core :as settings-view]
@@ -58,5 +58,5 @@
     (mount-connection-routes app-state)
     (mount-controller-routes app-state)
     (mount-settings-routes app-state)
-    (secretary/dispatch! "/settings")))
+    (locate! "#connection")))
 

@@ -3,6 +3,13 @@
 (defn current-time []
   (.getTime (js/Date.)))
 
+;;-- Routing helpers
+(defn locate!
+  "forces browser to change URL;
+  It's better than secretary/dispatch; because it makes back button to work;"
+  [url]
+  (.assign js/document.location (str url)))
+
 ;;-- DOM helpers
 (defn by-id
   ([id]
@@ -14,6 +21,7 @@
   ([dom-obj tag-name]
     (.getElementsByTagName dom-obj tag-name)))
 
+;;TODO: better (hide-by (by-id)...
 (defn hide-by-id!
   [id]
   (.setAttribute (by-id id) "style" "display:none"))

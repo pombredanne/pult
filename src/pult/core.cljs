@@ -12,8 +12,7 @@
             [pult.models.profiles :as profile-mdl]
             [pult.models.active-profile :as active-profile-mdl]
             [pult.utils :refer [current-time by-id by-tag-name
-                                hide-by-id! show-by-id! log error]]
-            ))
+                                log error locate!]]))
 
 ;history item: {:url "" :port "" :path ""}
 
@@ -94,9 +93,7 @@
   [ev]
   (log "Closing connection.")
   (stop-messenger)
-  ;(hide-by-id! "controller")
-  ;(show-by-id! "connection")
-  (secretary/dispatch! "/connection"))
+  (locate! "#connection"))
 
 (defn connect
   [conn-dt]
@@ -111,8 +108,7 @@
         (do
           (log "Connection success.")
           (swap! app-state (fn [xs] (assoc-in xs [:connection :uri] uri)))
-          (hide-by-id! "connection")
-          (show-by-id! "controller"))
+          (locate! "#controller"))
         (do
           (error "Connection failure.")
           (show-error "connection-msg" "Connection failure!"))))))

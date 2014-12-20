@@ -3,7 +3,7 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [reagent.cursor :refer [cursor]]
             [secretary.core :as secretary]
-            [pult.utils :refer [current-time log error]]
+            [pult.utils :refer [current-time log error locate!]]
             [pult.models.profiles :as profile-mdl]
             [pult.models.active-profile :as active-profile-mdl]
             [pult.components.actions.menu :as menu-action]))
@@ -175,7 +175,7 @@
                                             (fn [res]
                                               (log "deleted profile: " profile-id)
                                               (swap! profiles-cur remove-profile)
-                                              (secretary/dispatch! "/settings/mappings"))))}
+                                              (locate! "#settings/mappings"))))}
         [:i {:class "fa fa-trash"} " "] " Delete"]
 
       [:button
@@ -189,7 +189,7 @@
                                               :saved? true
                                               :changed? false)]
                        (swap! profiles-cur #(assoc-in % [:items new-id] new-profile))
-                       (secretary/dispatch! (str "/settings/mappings/" new-name))))}
+                       (locate! (str "#settings/mappings/" new-name))))}
         [:i {:class "fa fa-copy"} " "] " Clone"]
 
         [:button
