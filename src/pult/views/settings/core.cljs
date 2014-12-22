@@ -1,5 +1,5 @@
 (ns pult.views.settings.core
-  (:require [reagent.core :as reagent :refer [atom cursor]]
+  (:require [reagent.core :as reagent :refer [cursor]]
             [pult.components.actions.menu :as menu-action]))
 
 (defn render
@@ -9,6 +9,6 @@
       [:h3 "Settings"]
       "#connection"
       [["#settings/mappings" "Keymappings"]
-       ["#settings/credits"  "Credits"]
+       ["#settings/changelogs" "Changelogs"]
        ["#settings/license"  "License"]
        ["#settings/feedback" "Feedback"]])])

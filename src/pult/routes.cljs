@@ -10,7 +10,8 @@
             [pult.views.controller :as ctrl-app]
             [pult.views.settings.core :as settings-view]
             [pult.views.settings.keymapping :as mapping-view]
-            [pult.views.settings.mapping-form :as mapping-form])
+            [pult.views.settings.mapping-form :as mapping-form]
+            [pult.views.settings.changelog :as changelog-view])
   (:import goog.History))
 
 (defn mount-connection-routes
@@ -45,7 +46,12 @@
                #(assoc-in % [:profiles :items profile-id] profile-mdl/default-profile)))
       (swap! app-state (fn [xs] (assoc-in xs [:profiles :editing] profile-id)))
       (reagent/render-component [#(mapping-form/render app-state)]
-                                (by-id "app-container")))))
+                                (by-id "app-container"))))
+
+  (defroute changelogs "/settings/changelogs" []
+    (reagent/render-component [#(changelog-view/render app-state)]
+                               (by-id "app-container")))
+  )
 
 (defn mount
   [app-state]
