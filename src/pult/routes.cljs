@@ -11,7 +11,8 @@
             [pult.views.settings.core :as settings-view]
             [pult.views.settings.keymapping :as mapping-view]
             [pult.views.settings.mapping-form :as mapping-form]
-            [pult.views.settings.changelog :as changelog-view])
+            [pult.views.settings.changelog :as changelog-view]
+            [pult.views.settings.license :as license-view])
   (:import goog.History))
 
 (defn mount-connection-routes
@@ -50,6 +51,9 @@
 
   (defroute changelogs "/settings/changelogs" []
     (reagent/render-component [#(changelog-view/render app-state)]
+                               (by-id "app-container")))
+  (defroute licens "/settings/license" []
+    (reagent/render-component [#(license-view/render app-state)]
                                (by-id "app-container")))
   )
 

@@ -1,4 +1,4 @@
-(ns pult.views.settings.changelog
+(ns pult.views.settings.license
   (:require [reagent.core :as reagent]
             [pult.components.actions.menu :as menu-action]))
 
@@ -6,10 +6,9 @@
   [app-state]
   [:div {:class "pure-u-1"}
     (menu-action/render
-      [:h3 "Changelogs"]
+      [:h3 "License"]
       "#settings"
       [:div {:class "inline-page"}
-        [:iframe {:class "inline-page"
-                  :src "static/changelogs.html"
+        [:iframe {:src "static/license.html"
                   :seamless true}
-          "Here should be changelogs."]])])
+          "Here you should see software license."]])])
