@@ -7,7 +7,7 @@
   [:div {:class "pure-u-1 pure-xl-1-3 pure-lg-1-2"}
     (menu-action/render-list
       [:h3 "Settings"]
-      "#controller"
+      "#connection"
       [["#settings/mappings" "Keymappings"]
        ["#settings/credits"  "Credits"]
        ["#settings/license"  "License"]

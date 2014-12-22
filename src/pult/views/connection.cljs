@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [atom])
   (:require [reagent.core :as reagent
                           :refer [atom cursor]]
-            [cljs.core.async :as async]))
+            [cljs.core.async :as async]
+            [pult.components.actions.menu :refer [menu-list-header]]))
 
 (defonce form-data (atom {:url "127.0.0.1"
                           :port "8080"
@@ -93,6 +94,13 @@
         selected? (fn [tab-id]
                     (= tab-id (:selected @tab)))]
     [:div {:class "connection-container pure-g"}
+      (menu-list-header
+        "#"
+        [:span
+          [:h3 {:class "pull-left"} "Connection"]
+          [:a {:href "#settings"
+             :class "pure-button button-secondary pull-right"}
+            [:i {:class "fa fa-cogs"} " "]]])
       [:div {:id "connection-menu"
              :class "pure-u-1"}
         [:button
@@ -115,7 +123,8 @@
           [:i {:class "fa fa-hdd-o"} " "]
           "New connection"]]
       [:div {:id "connection-msg"
-             :class "pure-u-1"}]
+             :class "pure-u-1"
+             :style {:display "none"}}]
       [:div {:id "connection-form-container"
              :class "pure-u-1"}
        (case (:selected @tab)
