@@ -123,8 +123,8 @@
           [:i {:class "fa fa-hdd-o"} " "]
           "New connection"]]
       [:div {:id "connection-msg"
-             :class "pure-u-1"
-             :style {:display "none"}}]
+             :class "pure-u-1 pure-alert pure-error"
+             :style {:display "none"}} ""]
       [:div {:id "connection-form-container"
              :class "pure-u-1"}
        (case (:selected @tab)

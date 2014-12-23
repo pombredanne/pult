@@ -7,6 +7,7 @@
             [reagent.core :as reagent :refer [atom]]
             [reagent.cursor :refer [cursor]]
             [secretary.core :as secretary]
+            [clojure.string :as string]
             [pult.db :as db]
             [pult.routes :as routes]
             [pult.models.history :as history-mdl]
@@ -26,13 +27,13 @@
                                        :tab {:selected :prev}
                                        :history []}
                           :incoming-ch (async/chan 5)
-                          :outgoing-ch (async/chan (async/sliding-buffer 5))
+                          :outgoing-ch (async/chan (async/sliding-buffer 100))
                           :event-ch (async/chan 10)
                           :profiles {:active nil
                                      :editing nil
                                      :items {} ;profile-mdl/default-profile
                                      :active-history []}
-                          }))
+                          :author "TimGluz"}))
 
 ;;-- message handlers
 (defn listen-messages
@@ -56,13 +57,19 @@
 
 (defn start-messenger
   [url configs]
+  (let [show-error (fn [id msg]
+                     (let [err-el (by-id id)]
+                       (.setAttribute err-el "style" "display:block;")
+                       (set! (.-innerHTML err-el) (str "<p>" msg "</p>"))))]
   (go
     (let [{:keys [ws-channel error]} (<! (ws-ch url configs))
           incoming-ch (:incoming-ch @app-state)
           outgoing-ch (:outgoing-ch @app-state)]
       (if error
-        (do
-          (error "Cant open connection with the server." (pr-str error))
+        (let [err-msg (str "Cant open a connection with the server "
+                           "on `" url "` " (:reason error))]
+          (.error js/console err-msg " -> " (pr-str error))
+          (show-error "connection-msg" err-msg)
           false)
         (do
           (swap! app-state (fn [xs] (assoc-in xs [:connection :socket] ws-channel)))
@@ -70,7 +77,7 @@
           (send-messages ws-channel outgoing-ch)
           (handle-received-messages incoming-ch)
           (log "Connection opened successfully.")
-          true)))))
+          true))))))
 
 (defn stop-messenger
   []
@@ -87,20 +94,17 @@
 (defn connect
   [conn-dt]
   (let [{:keys [url port path]} (:data conn-dt)
-        show-error (fn [id msg]
-                     (set! (.-innerHTML (by-id id))
-                           (str "<p style = \"background-color: orange;\" >" msg "</p>")))
         uri (str "ws://" url ":" port "/" path)]
-    (vibrate! 10)
     (go
       (if-let [succ (<! (start-messenger uri {:format :edn}))]
         (do
           (log "Connection success.")
+          (vibrate! 10)
           (swap! app-state (fn [xs] (assoc-in xs [:connection :uri] uri)))
           (locate! "#controller"))
         (do
-          (error "Connection failure.")
-          (show-error "connection-msg" "Connection failure!"))))))
+          (vibrate! 20)
+          (error "Connection failure."))))))
 
 (defn on-connect
   "listen connection event on event-feed"
@@ -116,7 +120,7 @@
           (history-mdl/add
             db conn-dt
             (fn [_]
-              (history-mdl/get-n-latest db 10 #(reset! history %)))))
+              (history-mdl/get-n-latest db 7 #(reset! history %)))))
         (recur)))))
 
 (defmulti event->action
@@ -124,22 +128,30 @@
 
 (defmethod event->action "click" [ev]
   {:action :key-press
-   :duration 30
+   :duration 10
    :release? true})
 
 (defmethod event->action "touchstart" [ev]
   {:action :key-press
+   :duration 5
    :release? false})
 
 (defmethod event->action "touchend" [ev]
-  {:action :key-release})
+  {:action :key-release
+   :delay 5})
 
-(defmethod event->action "mousedown" [ev]
+(defn to-key-code
+  [key-name]
+  (-> key-name str string/upper-case keyword))
+
+(defmethod event->action "keyup" [ev]
   {:action :key-press
+   :key (to-key-code (.-key ev))
    :release? false})
 
-(defmethod event->action "mouseup" [ev]
-  {:action :key-release})
+(defmethod event->action "keydown" [ev]
+  {:action :key-release
+   :key (to-key-code (.-key ev))})
 
 (defmethod event->action :default [ev]
   (.error js/console "Unknown event - cant translate it to action." ev))
@@ -164,7 +176,7 @@
 (defn send-actions
   "listen controller actions on event channel and sends it to the server"
   [outgoing-ch event-feed source-id]
-  (let [ctrl-ch (async/chan (async/sliding-buffer 5))
+  (let [ctrl-ch (async/chan (async/sliding-buffer 50))
         profiles-cur (cursor [:profiles :items] app-state)]
     (async/sub event-feed source-id ctrl-ch)
     (log "Listening controller events ...")

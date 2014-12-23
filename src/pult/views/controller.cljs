@@ -1,7 +1,7 @@
 (ns pult.views.controller
   (:refer-clojure :exclude [atom])
-  (:require [reagent.core :as reagent
-                          :refer [atom cursor]]
+  (:require [reagent.core :as reagent :refer [atom cursor]]
+            [clojure.string :as string]
             [cljs.core.async :as async]
             [pult.utils :refer [by-id]]))
 
@@ -9,20 +9,12 @@
   [event-ch svg-doc]
   (let [ctrl-events [["btn-up"    "touchstart"]
                      ["btn-up"    "touchend"]
-                     ["btn-up"    "mousedown"]
-                     ["btn-up"    "mouseup"]
                      ["btn-down"  "touchstart"]
                      ["btn-down"  "touchend"]
-                     ["btn-down"  "mousedown"]
-                     ["btn-down"  "mouseup"]
                      ["btn-left"  "touchstart"]
                      ["btn-left"  "touchend"]
-                     ["btn-left"  "mousedown"]
-                     ["btn-left"  "mouseup"]
                      ["btn-right" "touchstart"]
                      ["btn-right" "touchend"]
-                     ["btn-right" "mousedown"]
-                     ["btn-right" "mouseup"]
                      ;;buttons with single impulse
                      ["btn-a"     "click"]
                      ["btn-b"     "click"]
@@ -53,6 +45,24 @@
                                  (add-ctrl-events event-ch (.-contentDocument el))))
                               this))}))
 
+(defn mount-keyboard-events
+  "listen keyboards events if it matches with activated binding
+  then put it into controller event's feed."
+  [app-state event-ch]
+  (let [el js/document
+        on-key (fn [ev]
+                     (let [active-id (get-in @app-state [:profiles :active])
+                           profile (get-in @app-state [:profiles :items active-id])
+                           registered-key-codes (-> profile :mappings vals set)
+                           to-key-code (fn [key-name]
+                                         (-> key-name str string/upper-case keyword))]
+                      (.preventDefault ev)
+                      (if (contains? registered-key-codes (to-key-code (.-key ev)))
+                        (async/put! event-ch {:source :controller :event ev})
+                        (.log js/console "Not registered key - going to ignore it."))))]
+    (.addEventListener el "keydown" on-key)
+    (.addEventListener el "keyup" on-key)))
+
 (defn show
   [event-ch ctrl-id]
   (let [X (.-width js/window.screen)
@@ -70,5 +80,6 @@
 (defn main [global-app-state]
   (let [ctrl-id "control-object"
         event-ch (:event-ch @global-app-state)]
+    (mount-keyboard-events global-app-state event-ch)
     (show event-ch ctrl-id)))
 
