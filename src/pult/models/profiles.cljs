@@ -4,9 +4,9 @@
 
 (def store-name "profiles")
 (def store-index "idIndex")
-(def default-profile {:id 0 ;should change before saving a new model
+(def default-profile {:id 0
                       :name "new"
-                      :saved? false
+                      :saved? false ;should be false when cloning or creating new
                       :changed? true
                       :description "Please rename before saving!"
                       :mappings {:btn-up    :UP
@@ -20,7 +20,9 @@
 
 (defn create
   [opts]
-   (merge default-profile opts))
+   (merge default-profile
+          {:id (current-time)}
+          opts))
 
 ;;TODO: add profile schema
 (defn add

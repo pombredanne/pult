@@ -77,23 +77,14 @@
                                           input-id (-> ev .-target .-value)))))
         on-save (fn [profile-cur ev]
                   (let [profile @profile-cur
-                        profile-id (if (and
-                                          (:saved? profile)
-                                          (pos? (get profile :id 0)))
-                                      (long (:id @profile-cur))
-                                      (current-time))
-                        new-profile (assoc profile
-                                           :saved? true
-                                           :changed? false
-                                           :id profile-id)]
+                        profile-id (:id profile)
+                        new-profile (assoc profile :saved? true :changed? false)]
                     (.preventDefault ev) ; dont fire FORM submit event
                     (log "Saving profile:" profile-id ":" (:name profile))
-                    (swap! profiles-cur
-                           #(assoc-in % [:items profile-id] new-profile))
+                    (reset! profile-cur new-profile)
                     (profile-mdl/upsert
                       db new-profile
-                      (fn [row]
-                        (log "Saved new item: " (pr-str new-profile))))))]
+                      (fn [row] (log "Saved new item: " (pr-str new-profile))))))]
     [:div {:class "pure-u-1"}
       [:form {:class "pure-form pure-form-stacked"}
         [:fieldset {:class "pure-group"}
@@ -106,6 +97,7 @@
                :type "text"
                :class "pure-input-1 pure-input-lg-1-2 pure-input-md-1-2"
                :placeholder "Profile name"
+               :autoComplete "off"
                :defaultValue (:name @profile)
                :on-change (partial on-input-change profile :name)}]]
           [:div {:class "pure-control-group"}
@@ -115,6 +107,7 @@
                :class "pure-input-1"
                :defaultValue (:description @profile)
                :placeholder "Profile description"
+               :autoComplete "off"
                :on-change (partial on-input-change profile :description)}]]]
 
         [:fieldset
@@ -169,15 +162,15 @@
       [:button
         {:class "pure-button button-secondary pure-u-1-3"
          :on-click (fn [ev]
-                     (let [new-name (str (:name @profile) "_copy_" (current-time))
-                           new-id (current-time)
+                     (let [new-id (current-time)
+                           new-name (str (:name @profile) "_copy_" new-id)
                            new-profile (assoc @profile
                                               :name new-name
                                               :id new-id
-                                              :saved? true
+                                              :saved? false
                                               :changed? false)]
                        (swap! profiles-cur #(assoc-in % [:items new-id] new-profile))
-                       (locate! (str "#settings/mappings/" new-name))))}
+                       (locate! (str "#settings/mappings/" new-id))))}
         [:i {:class "fa fa-copy"} " "] " Clone"]
 
         [:button

@@ -43,9 +43,14 @@
     (let [profile-id (long id)]
       (.log js/console "Showing mapping editor for: " profile-id)
       (if (= 0 profile-id)
-        (swap! app-state
-               #(assoc-in % [:profiles :items profile-id] profile-mdl/default-profile)))
-      (swap! app-state (fn [xs] (assoc-in xs [:profiles :editing] profile-id)))
+        ;when user asked to add new profile from scratch
+        (let [new-profile (profile-mdl/create {:saved? false})]
+          (swap! app-state
+                 #(assoc-in % [:profiles :items (:id new-profile)] new-profile))
+          (swap! app-state #(assoc-in % [:profiles :editing] (:id new-profile))))
+        ;for old profiles just swap editing number
+        (swap! app-state (fn [xs] (assoc-in xs [:profiles :editing] profile-id))))
+
       (reagent/render-component [#(mapping-form/render app-state)]
                                 (by-id "app-container"))))
 
