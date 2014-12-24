@@ -12,7 +12,7 @@
   [db-conn]
   (.log js/console "Inserting seed data..")
   (let [new-id (long (current-time))
-        db {:connection db-conn}
+        db (atom  {:connection db-conn})
         default-profile (profile-mdl/create {:saved? true
                                              :changed? false
                                              :id new-id
@@ -34,7 +34,10 @@
   (-> db-tx
       (idx/create-store "profile-history" {:keyPath "timestamp"})
       (idx/create-index "timeIndex" "timestamp" {:unique true}))
-  (insert-seed-data! db-tx))
+  (try
+    (insert-seed-data! db-tx)
+    (catch js/Object e
+      (.error js/console "failed to insert seed data." e))))
 
 (defn delete-all
   [db-tx]

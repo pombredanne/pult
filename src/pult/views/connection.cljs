@@ -77,7 +77,7 @@
        [:div {:class "pure-menu pure-menu-open"}
          [:ul
           (for [item @history]
-            ^{:key (str (:url item) "/" (:path item) ":" (rand-int 1000) )}
+            ^{:key (str (:timestamp item) "_" (rand-int 10000))}
             [:li
               [:a {:href "#" :class ""
                    :on-click (fn [ev]
@@ -85,9 +85,11 @@
                                (async/put! event-ch
                                            {:source :connection
                                             :data item}))}
-                (str "ws://" (:url item)
-                     ":" (:port item)
-                     "/" (:path item))]])]])]))
+                [:span
+                  (str "ws://" (:url item)
+                       ":" (:port item)
+                       "/" (:path item))
+                  [:small " - " (.fromNow (js/moment. (:timestamp item)))]]]])]])]))
 
 (defn main [global-app-state]
   (let [tab (cursor [:connection :tab] global-app-state)

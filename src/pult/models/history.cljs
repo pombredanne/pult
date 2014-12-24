@@ -38,7 +38,6 @@
       (->> rows
           (sort-by :timestamp >)
           (take n)
-          (map :data)
           (vec)
           (success-fn)))))
 

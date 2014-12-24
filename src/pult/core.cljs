@@ -93,7 +93,7 @@
 ;;TODO: refactor show-error into own component with function close button&timeout
 (defn connect
   [conn-dt]
-  (let [{:keys [url port path]} (:data conn-dt)
+  (let [{:keys [url port path]} conn-dt
         uri (str "ws://" url ":" port "/" path)]
     (go
       (if-let [succ (<! (start-messenger uri {:format :edn}))]
@@ -116,9 +116,10 @@
       (when-let [conn-dt (<! data-ch)]
         (let [db (cursor [:db] app-state)
               history (cursor [:connection :history] app-state)]
-          (connect conn-dt)
+          (connect (:data conn-dt))
           (history-mdl/add
-            db conn-dt
+            db
+            (:data conn-dt)
             (fn [_]
               (history-mdl/get-n-latest db 7 #(reset! history %)))))
         (recur)))))
