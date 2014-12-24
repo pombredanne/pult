@@ -1,5 +1,7 @@
 # Pult
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tauho/pult?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Pult ( *i.e "remote controller" in estonian* ) is *HTML5* app that turns any device that can run modern web browser into a classic game controller. 
 It's designed for mobilephones with touchscreens, but it works also on a desktop or on a raspberryPI with keyboard.
 
