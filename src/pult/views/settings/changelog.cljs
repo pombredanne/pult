@@ -9,7 +9,6 @@
       [:h3 "Changelogs"]
       "#settings"
       [:div {:class "inline-page"}
-        [:iframe {:class "inline-page"
-                  :src "static/changelogs.html"
+        [:iframe {:src "static/changelogs.html"
                   :seamless true}
           "Here should be changelogs."]])])

@@ -29451,17 +29451,17 @@ pult.components.actions.menu.menu_list_header = function menu_list_header(back_u
   3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "action-header-title"], null), content], null)], null)], null);
 };
 pult.components.actions.menu.render = function render(header, back_url, content) {
-  return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), pult.components.actions.menu.menu_list_header.call(null, back_url, header), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "action-content"], null), content], null)], 
-  null);
+  return new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "app-action"], null), pult.components.actions.menu.menu_list_header.call(null, back_url, header), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 
+  1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "action-content"], null), content], null)], null);
 };
 pult.components.actions.menu.render_list = function render_list(header, back_url, menu_items) {
   return pult.components.actions.menu.render.call(null, header, back_url, new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "action-content"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 
   1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-menu pure-menu-open"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "ul", "ul", -1349521403), cljs.core.empty_QMARK_.call(null, menu_items) ? new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "li", "li", 723558921), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, 
-  [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "href", "href", -793805698), "#new", new cljs.core.Keyword(null, "disabled", "disabled", -1529784218), "true"], null), "Add new profile"], null)], null) : cljs.core.map.call(null, function(p__5255) {
-    var vec__5256 = p__5255;
-    var url = cljs.core.nth.call(null, vec__5256, 0, null);
-    var title = cljs.core.nth.call(null, vec__5256, 1, null);
-    var selected_QMARK_ = cljs.core.nth.call(null, vec__5256, 2, null);
+  [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "href", "href", -793805698), "#new", new cljs.core.Keyword(null, "disabled", "disabled", -1529784218), "true"], null), "Add new profile"], null)], null) : cljs.core.map.call(null, function(p__10682) {
+    var vec__10683 = p__10682;
+    var url = cljs.core.nth.call(null, vec__10683, 0, null);
+    var title = cljs.core.nth.call(null, vec__10683, 1, null);
+    var selected_QMARK_ = cljs.core.nth.call(null, vec__10683, 2, null);
     return pult.components.actions.menu.menu_list_item.call(null, url, title, selected_QMARK_);
   }, menu_items)], null)], null)], null));
 };
@@ -46845,9 +46845,9 @@ goog.require("pult.components.actions.menu");
 goog.require("reagent.core");
 goog.require("reagent.core");
 pult.views.settings.core.render = function render(app_state) {
-  return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1 pure-xl-1-3 pure-lg-1-2"], null), pult.components.actions.menu.render_list.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "h3", "h3", 2067611163), "Settings"], null), 
-  "#connection", new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/mappings", "Keymappings"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/changelogs", "Changelogs"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/license", "License"], null), new cljs.core.PersistentVector(null, 
-  2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/readme", "Readme"], null)], null))], null);
+  return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1"], null), pult.components.actions.menu.render_list.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "h3", "h3", 2067611163), "Settings"], null), "#connection", new cljs.core.PersistentVector(null, 
+  4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/mappings", "Keymappings"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/changelogs", "Changelogs"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/license", "License"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, 
+  ["#settings/readme", "Readme"], null)], null))], null);
 };
 goog.provide("goog.Delay");
 goog.provide("goog.async.Delay");
@@ -52959,8 +52959,8 @@ goog.require("reagent.core");
 goog.require("reagent.core");
 pult.views.settings.changelog.render = function render(app_state) {
   return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1"], null), pult.components.actions.menu.render.call(null, new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "h3", "h3", 2067611163), "Changelogs"], null), "#settings", new cljs.core.PersistentVector(null, 
-  3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "inline-page"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "iframe", "iframe", 884422026), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "class", "class", -2030961996), "inline-page", new cljs.core.Keyword(null, 
-  "src", "src", -1651076051), "static/changelogs.html", new cljs.core.Keyword(null, "seamless", "seamless", -1120344251), true], null), "Here should be changelogs."], null)], null))], null);
+  3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "inline-page"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "iframe", "iframe", 884422026), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "src", "src", -1651076051), "static/changelogs.html", new cljs.core.Keyword(null, 
+  "seamless", "seamless", -1120344251), true], null), "Here should be changelogs."], null)], null))], null);
 };
 goog.provide("pult.views.settings.keymapping");
 goog.require("cljs.core");
@@ -52974,14 +52974,14 @@ pult.views.settings.keymapping.render = function render(app_state) {
   var active_profile_id = (new cljs.core.Keyword(null, "active", "active", 1895962068)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, profiles_cur));
   return function(profiles_cur, active_profile_id) {
     return function() {
-      return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1 pure-xl-1-3"], null), pult.components.actions.menu.render_list.call(null, new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), new cljs.core.PersistentVector(null, 
+      return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1"], null), pult.components.actions.menu.render_list.call(null, new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), new cljs.core.PersistentVector(null, 
       3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "h3", "h3", 2067611163), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pull-left"], null), "Keymappings"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "href", "href", -793805698), "#settings/mappings/0", 
       new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-button button-secondary pull-right"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "i", "i", -1386841315), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "fa fa-plus"], null)], null)], null)], null), "#settings", cljs.core.vec.call(null, cljs.core.map.call(null, function(profiles_cur, active_profile_id) {
-        return function(p__10742) {
-          var map__10743 = p__10742;
-          var map__10743__$1 = cljs.core.seq_QMARK_.call(null, map__10743) ? cljs.core.apply.call(null, cljs.core.hash_map, map__10743) : map__10743;
-          var id = cljs.core.get.call(null, map__10743__$1, new cljs.core.Keyword(null, "id", "id", -1388402092));
-          var name = cljs.core.get.call(null, map__10743__$1, new cljs.core.Keyword(null, "name", "name", 1843675177));
+        return function(p__10642) {
+          var map__10643 = p__10642;
+          var map__10643__$1 = cljs.core.seq_QMARK_.call(null, map__10643) ? cljs.core.apply.call(null, cljs.core.hash_map, map__10643) : map__10643;
+          var id = cljs.core.get.call(null, map__10643__$1, new cljs.core.Keyword(null, "id", "id", -1388402092));
+          var name = cljs.core.get.call(null, map__10643__$1, new cljs.core.Keyword(null, "name", "name", 1843675177));
           return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, ["#settings/mappings/" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(id), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(name), cljs.core._EQ_.call(null, id, active_profile_id)], null);
         };
       }(profiles_cur, active_profile_id), cljs.core.vals.call(null, (new cljs.core.Keyword(null, "items", "items", 1031954938)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, profiles_cur))))))], null);
@@ -53656,7 +53656,7 @@ if (typeof pult.views.connection.form_data !== "undefined") {
   pult.views.connection.form_data = reagent.core.atom.call(null, new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "url", "url", 276297046), "127.0.0.1", new cljs.core.Keyword(null, "port", "port", 1534937262), "8080", new cljs.core.Keyword(null, "path", "path", -188191168), "ws"], null));
 }
 pult.views.connection.show_form = function show_form(global_app_state) {
-  return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1"], null), function() {
+  return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1 app-action"], null), function() {
     var form_dt = cljs.core.deref.call(null, pult.views.connection.form_data);
     var event_ch = (new cljs.core.Keyword(null, "event-ch", "event-ch", 1535658105)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, global_app_state));
     return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "form", "form", -1624062471), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "id", "id", -1388402092), "connection-form", new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-form pure-form-aligned"], null), new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "fieldset", "fieldset", 
@@ -53695,34 +53695,34 @@ pult.views.connection.show_previous = function show_previous(global_app_state) {
   2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "i", "i", -1386841315), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "fa fa-info"], null)], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "strong", "strong", 269529E3), "No previous connection."], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, 
   "p", "p", 151049309), "Please add new connection."], null)], null) : new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-menu pure-menu-open"], null), new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "ul", "ul", -1349521403), function() {
     var iter__4379__auto__ = function(history, event_ch) {
-      return function iter__12702(s__12703) {
+      return function iter__10660(s__10661) {
         return new cljs.core.LazySeq(null, function(history, event_ch) {
           return function() {
-            var s__12703__$1 = s__12703;
+            var s__10661__$1 = s__10661;
             while (true) {
-              var temp__4126__auto__ = cljs.core.seq.call(null, s__12703__$1);
+              var temp__4126__auto__ = cljs.core.seq.call(null, s__10661__$1);
               if (temp__4126__auto__) {
-                var s__12703__$2 = temp__4126__auto__;
-                if (cljs.core.chunked_seq_QMARK_.call(null, s__12703__$2)) {
-                  var c__4377__auto__ = cljs.core.chunk_first.call(null, s__12703__$2);
+                var s__10661__$2 = temp__4126__auto__;
+                if (cljs.core.chunked_seq_QMARK_.call(null, s__10661__$2)) {
+                  var c__4377__auto__ = cljs.core.chunk_first.call(null, s__10661__$2);
                   var size__4378__auto__ = cljs.core.count.call(null, c__4377__auto__);
-                  var b__12705 = cljs.core.chunk_buffer.call(null, size__4378__auto__);
+                  var b__10663 = cljs.core.chunk_buffer.call(null, size__4378__auto__);
                   if (function() {
-                    var i__12704 = 0;
+                    var i__10662 = 0;
                     while (true) {
-                      if (i__12704 < size__4378__auto__) {
-                        var item = cljs.core._nth.call(null, c__4377__auto__, i__12704);
-                        cljs.core.chunk_append.call(null, b__12705, cljs.core.with_meta(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "li", "li", 723558921), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "href", "href", -793805698), "#", new cljs.core.Keyword(null, "class", "class", 
-                        -2030961996), "", new cljs.core.Keyword(null, "on-click", "on-click", 1632826543), function(i__12704, item, c__4377__auto__, size__4378__auto__, b__12705, s__12703__$2, temp__4126__auto__, history, event_ch) {
+                      if (i__10662 < size__4378__auto__) {
+                        var item = cljs.core._nth.call(null, c__4377__auto__, i__10662);
+                        cljs.core.chunk_append.call(null, b__10663, cljs.core.with_meta(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "li", "li", 723558921), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "href", "href", -793805698), "#", new cljs.core.Keyword(null, "class", "class", 
+                        -2030961996), "", new cljs.core.Keyword(null, "on-click", "on-click", 1632826543), function(i__10662, item, c__4377__auto__, size__4378__auto__, b__10663, s__10661__$2, temp__4126__auto__, history, event_ch) {
                           return function(ev) {
                             console.log("Connecting with ", cljs.core.pr_str.call(null, item));
                             return cljs.core.async.put_BANG_.call(null, event_ch, new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "source", "source", -433931539), new cljs.core.Keyword(null, "connection", "connection", -123599300), new cljs.core.Keyword(null, "data", "data", -232669377), item], null));
                           };
-                        }(i__12704, item, c__4377__auto__, size__4378__auto__, b__12705, s__12703__$2, temp__4126__auto__, history, event_ch)], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), "ws://" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "url", "url", 276297046)).cljs$core$IFn$_invoke$arity$1(item)) + ":" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, 
+                        }(i__10662, item, c__4377__auto__, size__4378__auto__, b__10663, s__10661__$2, temp__4126__auto__, history, event_ch)], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), "ws://" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "url", "url", 276297046)).cljs$core$IFn$_invoke$arity$1(item)) + ":" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, 
                         "port", "port", 1534937262)).cljs$core$IFn$_invoke$arity$1(item)) + "/" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "path", "path", -188191168)).cljs$core$IFn$_invoke$arity$1(item)), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "small", "small", 2133478704), " - ", (new moment((new cljs.core.Keyword(null, "timestamp", "timestamp", 579478971)).cljs$core$IFn$_invoke$arity$1(item))).fromNow()], 
                         null)], null)], null)], null), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "key", "key", -1516042587), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "timestamp", "timestamp", 579478971)).cljs$core$IFn$_invoke$arity$1(item)) + "_" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.rand_int.call(null, 1E4))], null)));
-                        var G__12706 = i__12704 + 1;
-                        i__12704 = G__12706;
+                        var G__10664 = i__10662 + 1;
+                        i__10662 = G__10664;
                         continue;
                       } else {
                         return true;
@@ -53730,21 +53730,21 @@ pult.views.connection.show_previous = function show_previous(global_app_state) {
                       break;
                     }
                   }()) {
-                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__12705), iter__12702.call(null, cljs.core.chunk_rest.call(null, s__12703__$2)));
+                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__10663), iter__10660.call(null, cljs.core.chunk_rest.call(null, s__10661__$2)));
                   } else {
-                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__12705), null);
+                    return cljs.core.chunk_cons.call(null, cljs.core.chunk.call(null, b__10663), null);
                   }
                 } else {
-                  var item = cljs.core.first.call(null, s__12703__$2);
+                  var item = cljs.core.first.call(null, s__10661__$2);
                   return cljs.core.cons.call(null, cljs.core.with_meta(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "li", "li", 723558921), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "href", "href", -793805698), "#", new cljs.core.Keyword(null, "class", "class", -2030961996), 
-                  "", new cljs.core.Keyword(null, "on-click", "on-click", 1632826543), function(item, s__12703__$2, temp__4126__auto__, history, event_ch) {
+                  "", new cljs.core.Keyword(null, "on-click", "on-click", 1632826543), function(item, s__10661__$2, temp__4126__auto__, history, event_ch) {
                     return function(ev) {
                       console.log("Connecting with ", cljs.core.pr_str.call(null, item));
                       return cljs.core.async.put_BANG_.call(null, event_ch, new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "source", "source", -433931539), new cljs.core.Keyword(null, "connection", "connection", -123599300), new cljs.core.Keyword(null, "data", "data", -232669377), item], null));
                     };
-                  }(item, s__12703__$2, temp__4126__auto__, history, event_ch)], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), "ws://" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "url", "url", 276297046)).cljs$core$IFn$_invoke$arity$1(item)) + ":" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "port", "port", 1534937262)).cljs$core$IFn$_invoke$arity$1(item)) + 
+                  }(item, s__10661__$2, temp__4126__auto__, history, event_ch)], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), "ws://" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "url", "url", 276297046)).cljs$core$IFn$_invoke$arity$1(item)) + ":" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "port", "port", 1534937262)).cljs$core$IFn$_invoke$arity$1(item)) + 
                   "/" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "path", "path", -188191168)).cljs$core$IFn$_invoke$arity$1(item)), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "small", "small", 2133478704), " - ", (new moment((new cljs.core.Keyword(null, "timestamp", "timestamp", 579478971)).cljs$core$IFn$_invoke$arity$1(item))).fromNow()], null)], null)], null)], null), new cljs.core.PersistentArrayMap(null, 
-                  1, [new cljs.core.Keyword(null, "key", "key", -1516042587), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "timestamp", "timestamp", 579478971)).cljs$core$IFn$_invoke$arity$1(item)) + "_" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.rand_int.call(null, 1E4))], null)), iter__12702.call(null, cljs.core.rest.call(null, s__12703__$2)));
+                  1, [new cljs.core.Keyword(null, "key", "key", -1516042587), "" + cljs.core.str.cljs$core$IFn$_invoke$arity$1((new cljs.core.Keyword(null, "timestamp", "timestamp", 579478971)).cljs$core$IFn$_invoke$arity$1(item)) + "_" + cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.rand_int.call(null, 1E4))], null)), iter__10660.call(null, cljs.core.rest.call(null, s__10661__$2)));
                 }
               } else {
                 return null;
@@ -53765,11 +53765,11 @@ pult.views.connection.main = function main(global_app_state) {
       return cljs.core._EQ_.call(null, tab_id, (new cljs.core.Keyword(null, "selected", "selected", 574897764)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, tab)));
     };
   }(tab);
-  return new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "connection-container pure-g"], null), pult.components.actions.menu.menu_list_header.call(null, "#", new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), new cljs.core.PersistentVector(null, 
-  3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "h3", "h3", 2067611163), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pull-left"], null), "Connection"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "href", "href", -793805698), "#settings", new cljs.core.Keyword(null, 
-  "class", "class", -2030961996), "pure-button button-secondary pull-right"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "i", "i", -1386841315), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "fa fa-cogs"], null), " "], null)], null)], null)), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), 
-  new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "id", "id", -1388402092), "connection-menu", new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1"], null), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "button", "button", 1456579943), cljs.core.merge.call(null, new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-button pure-u-1-2", new cljs.core.Keyword(null, 
-  "on-click", "on-click", 1632826543), function(tab, selected_QMARK_) {
+  return new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "connection-container app-action pure-g"], null), pult.components.actions.menu.menu_list_header.call(null, "#", new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "span", "span", 1394872991), 
+  new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "h3", "h3", 2067611163), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "pull-left"], null), "Connection"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "a", "a", -2123407586), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "href", "href", 
+  -793805698), "#settings", new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-button button-secondary pull-right"], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "i", "i", -1386841315), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "fa fa-cogs"], null), " "], null)], null)], null)), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, 
+  [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "id", "id", -1388402092), "connection-menu", new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1"], null), new cljs.core.PersistentVector(null, 4, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "button", "button", 1456579943), cljs.core.merge.call(null, new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, "class", 
+  "class", -2030961996), "pure-button pure-u-1-2", new cljs.core.Keyword(null, "on-click", "on-click", 1632826543), function(tab, selected_QMARK_) {
     return function(ev) {
       console.log("user clicked on history");
       cljs.core.reset_BANG_.call(null, tab, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "selected", "selected", 574897764), new cljs.core.Keyword(null, "prev", "prev", -1597069226)], null));
@@ -53785,8 +53785,8 @@ pult.views.connection.main = function main(global_app_state) {
   3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "i", "i", -1386841315), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "class", "class", -2030961996), "fa fa-hdd-o"], null), " "], null), "New connection"], null)], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null, "id", "id", -1388402092), 
   "connection-msg", new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1 pure-alert pure-error", new cljs.core.Keyword(null, "style", "style", -496642736), new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null, "display", "display", 242065432), "none"], null)], null), ""], null), new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null, "div", "div", 1057191632), new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null, 
   "id", "id", -1388402092), "connection-form-container", new cljs.core.Keyword(null, "class", "class", -2030961996), "pure-u-1"], null), function() {
-    var G__12708 = (new cljs.core.Keyword(null, "selected", "selected", 574897764)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, tab)) instanceof cljs.core.Keyword ? (new cljs.core.Keyword(null, "selected", "selected", 574897764)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, tab)).fqn : null;
-    switch(G__12708) {
+    var G__10666 = (new cljs.core.Keyword(null, "selected", "selected", 574897764)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, tab)) instanceof cljs.core.Keyword ? (new cljs.core.Keyword(null, "selected", "selected", 574897764)).cljs$core$IFn$_invoke$arity$1(cljs.core.deref.call(null, tab)).fqn : null;
+    switch(G__10666) {
       case "new":
         return pult.views.connection.show_form.call(null, global_app_state);
         break;

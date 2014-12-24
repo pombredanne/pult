@@ -1,21 +1,3 @@
-/* Rewrite with Garden */
-
-.pure-alert {
-  color: white;
-  padding: 5px;
-  border-radius: 1px solid transparent;
-}
-
-.pure-alert .close {
-  position: relative;
-  top: -2px;
-  right: -21px;
-  color: inherit;
-  background: inherit;
-  border:0px;
-}
-
-
 .app-action {
   overflow: hidden;
   min-height: 100%;
@@ -27,48 +9,92 @@
 }
 
 .legend {
-  color : white;
-}
-
-.button-success,
-.button-error,
-.button-warning,
-.button-secondary {
   color: white;
-  border-radius: 0px;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
-.pure-success,
+.pure-alert {
+  border-radius: 1px solid transparent;
+  padding: 5px;
+  color: white;
+}
+
+.pure-alert .close {
+  border: 0px;
+  background: inherit;
+  color: inherit;
+  right: -21px;
+  top: -2px;
+  position: relative;
+}
+
+.pure-success {
+  background: #1cb841;
+}
+
+.pure-error {
+  background: #ca3c3c;
+}
+
+.pure-warning {
+  background: #df7514;
+}
+
+.pure-secondary {
+  background: #42b8dd;
+}
+
 .button-success {
-  background: rgb(28, 184, 65); /* this is a green */
+  background-color: #1cb841;
 }
 
-.pure-error,
 .button-error {
-  background: rgb(202, 60, 60); /* this is a maroon */
+  background-color: #ca3c3c;
 }
 
-.pure-warning,
 .button-warning {
-  background: rgb(223, 117, 20); /* this is an orange */
+  background-color: #df7514;
 }
 
-.pure-secondary,
 .button-secondary {
-  background: rgb(66, 184, 221); /* this is a light blue */
+  background-color: #42b8dd;
 }
 
+.button-success, .button-error, .button-warning, .button-secondary {
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  border-radius: 0px;
+  color: white;
+}
+
+.app-action h1, .app-action h2, .app-action h3, .app-action h4, .app-action h5, .app-action h6 {
+  margin: 5px 7px;
+}
+
+.app-action .action-header {
+  background-color: steelblue;
+}
+
+.app-action .action-header .action-header-title {
+  color: white;
+}
+
+.app-action .action-list-item {
+
+}
+
+.app-action .action-list-item .to-right {
+  right: 15px;
+  position: absolute;
+}
 
 .inline-page {
-  width: 100%;
-  height: 100%;
-  border: 0px;
   position: fixed;
+  border: 0px;
+  height: 100%;
+  width: 100%;
 }
 
 .inline-page iframe {
-  width: 100%;
-  height: 100%;
   border: 0px;
+  height: 100%;
+  width: 100%;
 }

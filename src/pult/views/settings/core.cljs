@@ -4,7 +4,7 @@
 
 (defn render
   [app-state]
-  [:div {:class "pure-u-1 pure-xl-1-3 pure-lg-1-2"}
+  [:div {:class "pure-u-1"}
     (menu-action/render-list
       [:h3 "Settings"]
       "#connection"

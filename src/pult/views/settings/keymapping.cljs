@@ -8,7 +8,7 @@
   (let [profiles-cur (cursor [:profiles] app-state)
         active-profile-id (:active @profiles-cur)]
     (fn []
-      [:div {:class "pure-u-1 pure-xl-1-3"}
+      [:div {:class "pure-u-1"}
         (menu-action/render-list
           [:span
             [:h3 {:class "pull-left"} "Keymappings"]

@@ -8,3 +8,7 @@ staticpages:
 	md2html LICENSE.md > static/license.html
 	md2html README.md > static/readme.html
 
+#compile all garden-files into css stylepages
+css:
+	lein garden once
+

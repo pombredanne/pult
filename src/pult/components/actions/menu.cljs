@@ -29,7 +29,7 @@
 
 (defn render
   [header back-url content]
-  [:div
+  [:div {:class "app-action"}
     (menu-list-header back-url header)
     [:div {:class "action-content"}
       content]])

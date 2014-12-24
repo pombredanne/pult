@@ -12,7 +12,7 @@
 (defn show-form
   [global-app-state]
   [:div
-    {:class "pure-u-1"}
+    {:class "pure-u-1 app-action"}
     (let [form-dt @form-data
           event-ch (:event-ch @global-app-state)]
       [:form
@@ -95,7 +95,7 @@
   (let [tab (cursor [:connection :tab] global-app-state)
         selected? (fn [tab-id]
                     (= tab-id (:selected @tab)))]
-    [:div {:class "connection-container pure-g"}
+    [:div {:class "connection-container app-action pure-g"}
       (menu-list-header
         "#"
         [:span
