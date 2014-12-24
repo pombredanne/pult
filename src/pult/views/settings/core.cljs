@@ -11,4 +11,4 @@
       [["#settings/mappings" "Keymappings"]
        ["#settings/changelogs" "Changelogs"]
        ["#settings/license"  "License"]
-       ["#settings/feedback" "Feedback"]])])
+       ["#settings/readme" "Readme"]])])

@@ -12,7 +12,8 @@
             [pult.views.settings.keymapping :as mapping-view]
             [pult.views.settings.mapping-form :as mapping-form]
             [pult.views.settings.changelog :as changelog-view]
-            [pult.views.settings.license :as license-view])
+            [pult.views.settings.license :as license-view]
+            [pult.views.settings.readme :as readme-view])
   (:import goog.History))
 
 (defn mount-connection-routes
@@ -59,6 +60,9 @@
                                (by-id "app-container")))
   (defroute licens "/settings/license" []
     (reagent/render-component [#(license-view/render app-state)]
+                               (by-id "app-container")))
+  (defroute licens "/settings/readme" []
+    (reagent/render-component [#(readme-view/render app-state)]
                                (by-id "app-container")))
   )
 
