@@ -3,6 +3,8 @@
   (:require [reagent.core :as reagent
                           :refer [atom cursor]]
             [cljs.core.async :as async]
+            [cljs-time.core :as time]
+            [cljs-time.coerce :as time-coerce :refer [from-long to-local-date-time]]
             [pult.components.actions.menu :refer [menu-list-header]]))
 
 (defonce form-data (atom {:url "127.0.0.1"
@@ -57,11 +59,9 @@
                :type "button"
                :on-click (fn [e]
                             (.debug js/console "Connecting...")
-                            ;TODO: save connection
                             (async/put! event-ch
                                         {:source :connection
-                                         :data @form-data})
-                            )}
+                                         :data @form-data}))}
               "Connect"]]]])])
 
 (defn show-previous [global-app-state]
@@ -77,7 +77,7 @@
        [:div {:class "pure-menu pure-menu-open"}
          [:ul
           (for [item @history]
-            ^{:key (str (:timestamp item) "_" (rand-int 10000))}
+            ^{:key (str (:timestamp item) "_" (rand-int 100))}
             [:li
               [:a {:href "#" :class ""
                    :on-click (fn [ev]
@@ -89,7 +89,10 @@
                   (str "ws://" (:url item)
                        ":" (:port item)
                        "/" (:path item))
-                  [:small " - " (.fromNow (js/moment. (:timestamp item)))]]]])]])]))
+                  [:small
+                    (str " - "
+                      (-> item :timestamp from-long to-local-date-time time-coerce/to-string))]
+                  ]]])]])]))
 
 (defn main [global-app-state]
   (let [tab (cursor [:connection :tab] global-app-state)

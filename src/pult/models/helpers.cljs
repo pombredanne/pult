@@ -8,7 +8,7 @@
     (add db store-name row-dt #(log "Success: new item in " store-name)))
   ([db store-name row-dt success-fn]
     (if (empty? row-dt)
-      (.error js/console "Can't add empty data into " store-name)
+      (error "Can't add empty data into " store-name)
       (idx/add-item (:connection @db) store-name row-dt success-fn))))
 
 (defn get-by

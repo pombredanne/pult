@@ -33,7 +33,9 @@
                                      :editing nil
                                      :items {} ;profile-mdl/default-profile
                                      :active-history []}
-                          :author "TimGluz"}))
+                          :author "TimGluz"
+                          :client-id "pult-1" ;TODO: it should be GUID
+                          }))
 
 ;;-- message handlers
 (defn listen-messages
@@ -185,17 +187,18 @@
       (when-let [dt (<! ctrl-ch)]
         (let [btn-id (.. (:event dt) -target -id)
               special-ids #{"btn-configure" "btn-connect"}
+              client-id (get @app-state :client-id)
               active-profile-id (long (get-in @app-state [:profiles :active]))
               btn-code (get-in @profiles-cur
                                [active-profile-id :mappings (keyword btn-id)]
                                :UNDEFINED)]
-          ;(log " btn=id: " btn-id " -> " btn-code)
           (if (contains? special-ids btn-id)
             (on-special-key btn-id) ;special key = dont send it to server
             (some->>
                   (:event dt)
                   event->action
                   (merge {:id :command
+                          :client-id client-id
                           :key btn-code
                           :start (current-time)})
                   (async/put! outgoing-ch)))

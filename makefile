@@ -12,3 +12,7 @@ staticpages:
 css:
 	lein garden once
 
+clean:
+	lein clean
+	rm js/pult*.js
+

@@ -41,6 +41,12 @@
 ;;-- API helpers
 (defn vibrate!
   [duration]
-  (.vibrate js/navigator duration))
-
+  (let [obj js/navigator
+        action-fn (aget js/navigator "vibrate")]
+    (.log js/console "Here it should vibrate!")
+    (try
+      ;(.vibrate js/navigator duration); doesnt work event with externs
+      (.call action-fn obj duration)
+      (catch js/Object e
+        (.error js/console "Failed to call FirefoxOS api `vibrate`: " e)))))
 

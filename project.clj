@@ -15,7 +15,8 @@
                  [weasel "0.4.0-SNAPSHOT"]
                  [jarohen/chord "0.4.2" :exclusions [org.clojure/clojure]]
                  [cljs-idxdb "0.1.0"]
-                 [garden "1.2.5"]]
+                 [garden "1.2.5"]
+                 [com.andrewmcveigh/cljs-time  "0.2.4"]]
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-simpleton "1.3.0"]
             [lein-garden "0.2.5"]]
@@ -34,11 +35,14 @@
               :builds {:dev {:source-paths ["src"]
                              :compiler {:output-to "js/pult-dev.js"
                                         :optimizations :whitespace
-                                        :pretty-print true}}
+                                        :pretty-print true
+                                        :source-map true}}
                        :prod {:source-paths ["src"]
-                              :compiler {:output-to "js/pult.js"}
-                              :optimizations :advanced
-                              :pretty-print false}
+                              :compiler {:output-to "js/pult.js"
+                                         :optimizations :advanced
+                                         :externs ["js/externs/navigator.js"
+                                                   "js/externs/react.js"]
+                                         :pretty-print false}}
                        :test {:source-paths ["src" "test"]
                               :compiler {:output-to "test/unit-tests.js"
                                          :optimizations :whitespace
