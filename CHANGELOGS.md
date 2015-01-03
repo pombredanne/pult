@@ -1,6 +1,7 @@
 ## CHANGELOGS
 
 
-#### 0.0.1
+#### 0.0.1 - Alpha release
 
-  * [ *Feature* ] - initialized new project, [commit-sha](https://github.com/your_org/pult/commits/1)
+
+* [issue #12]() - add X

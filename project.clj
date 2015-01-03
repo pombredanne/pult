@@ -35,10 +35,10 @@
               :builds {:dev {:source-paths ["src"]
                              :compiler {:output-to "js/pult-dev.js"
                                         :optimizations :whitespace
-                                        :pretty-print true
-                                        :source-map true}}
+                                        :pretty-print true}}
                        :prod {:source-paths ["src"]
                               :compiler {:output-to "js/pult.js"
+                                         ;:source-map "pult.js.map"
                                          :optimizations :advanced
                                          :externs ["js/externs/navigator.js"
                                                    "js/externs/react.js"]

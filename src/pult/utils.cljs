@@ -37,16 +37,32 @@
 (defn error [& msgs]
   (.error js/console (apply str msgs)))
 
-
 ;;-- API helpers
 (defn vibrate!
   [duration]
   (let [obj js/navigator
         action-fn (aget js/navigator "vibrate")]
-    (.log js/console "Here it should vibrate!")
+    (log "Here it should vibrate!")
     (try
       ;(.vibrate js/navigator duration); doesnt work event with externs
       (.call action-fn obj duration)
       (catch js/Object e
-        (.error js/console "Failed to call FirefoxOS api `vibrate`: " e)))))
+        (error "Failed to call FirefoxOS api `vibrate`: " e)))))
 
+(defn squuid
+  "Constructs a semi-sequential UUID. Useful for creating UUIDs that
+  don't fragment indexes. Returns a UUID whose most significant 32
+  bits are the current time in milliseconds, rounded to the nearest
+  second."
+  []
+  (let [current-seconds (-> (.now js/Date)
+                            (/ 1000)
+                            (Math/round))
+        seconds-hex (.toString current-seconds 16)
+        trailing (.replace "-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+                           (js/RegExp. "[xy]" "g")
+                           (fn [c]
+                              (let [r (bit-or (* 16 (Math/random)) 0)
+                                    v (if (= c "x") r (bit-or (bit-and r 0x3) 0x8))]
+                                (.toString v 16))))]
+    (UUID. (str seconds-hex trailing))))

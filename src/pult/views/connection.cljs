@@ -69,9 +69,13 @@
         event-ch (:event-ch @global-app-state)]
     [:div {:class "pure-u-1"}
       (if (empty? @history)
-       [:span
-        [:i {:class "fa fa-info"}]
-        [:strong "No previous connection."]
+       [:span {:style {:text-align "center"}}
+        [:i {:class "fa fa-info-circle"
+             :style {:margin "0 45%"
+                     :color "orange"
+                     :font-size "3.5em"}} " "]
+        [:br]
+        [:h2 " No previous connection."]
         [:p "Please add new connection."]]
        ;if there's data
        [:div {:class "pure-menu pure-menu-open"}

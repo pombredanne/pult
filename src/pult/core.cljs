@@ -13,6 +13,7 @@
             [pult.models.history :as history-mdl]
             [pult.models.profiles :as profile-mdl]
             [pult.models.active-profile :as active-profile-mdl]
+            [pult.models.settings :as settings-mdl]
             [pult.utils :refer [current-time by-id by-tag-name
                                 log error locate! vibrate!]]))
 
@@ -20,6 +21,7 @@
 ;;TODO: add schema, specially history&profile items
 ;;pult.schemas.profiles/Profile ??
 (defonce app-state (atom {:db {:name "pultdb"
+                               :initialized? false ;true if data-seed is saved
                                :version 1
                                :connection nil}
                           :connection {:uri "ws://127.0.0.1:8080/ws"
@@ -34,8 +36,7 @@
                                      :items {} ;profile-mdl/default-profile
                                      :active-history []}
                           :author "TimGluz"
-                          :client-id "pult-1" ;TODO: it should be GUID
-                          }))
+                          :client-id "cant-read-id"}))
 
 ;;-- message handlers
 (defn listen-messages
@@ -206,12 +207,10 @@
           (recur))))
     (log "Stopped listening controller actions.")))
 
-(defn start-db
-  "create db connection and after successful attempt loads initial data into
-  global app-state;"
-  [app-state]
-  (let [db (cursor [:db] app-state)
-        history (cursor [:connection :history] app-state)
+
+(defn load-db-data
+  [db app-state]
+  (let [history (cursor [:connection :history] app-state)
         profiles (cursor [:profiles :items] app-state)
         keywordize-keys (fn [profile]
                           ;cljs-idx dont restore saved keywords as keys
@@ -230,16 +229,54 @@
                                      (fn [xs]
                                        (-> xs
                                        (assoc-in [:profiles :active] (-> rows first :id long))
-                                       (assoc-in [:profiles :active-history] (vec rows))))))]
+                                       (assoc-in [:profiles :active-history] (vec rows))))))
+        add-client-id (fn [app-state client-id]
+                        (log "Client id: " client-id)
+                        (swap! app-state
+                               #(assoc % :client-id client-id)))]
+
+    (settings-mdl/get-client-id db (partial add-client-id app-state))
+    (history-mdl/get-n-latest db 7 #(reset! history %))
+    (profile-mdl/get-all db (partial add-profiles profiles))
+    (active-profile-mdl/get-n-latest db 7 (partial add-active-profiles app-state))))
+
+
+(defn start-db
+  "creates db connection and after successful attempt checks does DB has initial data,
+  if yes then it will load required data into global app-state
+  otherwise it adds missing dataseed and reloads app;"
+  [app-state]
+  (let [db-cur (cursor [:db] app-state)
+        show-error (fn [msg]
+                     (set! (.-innerHTML js/document.body)
+                           (str "<h2>" msg "</h2>")))
+        update-db-state (fn [db-conn app-state status]
+                  (if (true? status)
+                    (do
+                      (log "DB already initialized - going to load data.")
+                      (swap! app-state #(assoc-in % [:db :initialized?] status))
+                      (load-db-data db-conn app-state))
+                    ;-- if database isnot initialized aka no seed data
+                    (do
+                      (log "DB was not initialized.")
+                      ;TODO: better alerting
+                      (show-error "Please wait! Initializing settings.")
+                      (db/add-seed-data! db-conn #(locate! "./index.html")))))]
     (db/connect
-      db
+      db-cur
       (fn [conn]
         (.log js/console "Database is now connected.")
-        (swap! db #(assoc % :connection conn))
-        (history-mdl/get-n-latest db 7 #(reset! history %))
-        (profile-mdl/get-all db (partial add-profiles profiles))
-        (active-profile-mdl/get-n-latest db 7 (partial add-active-profiles app-state))
-        ))))
+        (swap! db-cur #(assoc % :connection conn))
+        ;check is db initialized
+        (try
+          (log "Checking DB status...")
+          (settings-mdl/get-db-state
+            db-cur
+            #(update-db-state db-cur app-state %))
+          (catch js/Object ex
+            (.error js/console ex)
+            (log "Database is empty - going to add seed data.")
+            (update-db-state db-cur app-state false)))))))
 
 (defn ^:export main []
   (let [outgoing-ch (:outgoing-ch @app-state)
