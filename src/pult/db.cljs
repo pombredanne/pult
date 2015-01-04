@@ -8,7 +8,7 @@
 (def db-name "pultdb")
 (def db-version 1)
 
-;var request = window.indexedDB.deleteDatabase("pultDB");
+;var request = indexedDB.deleteDatabase("pultDB");
 (defn add-seed-data!
   [db success-fn]
   (log "Inserting seed data..")
@@ -16,7 +16,6 @@
     (profile-mdl/add
       db
       (profile-mdl/create {:saved? true
-                           :changed? false
                            :id new-id
                            :name "NES_remote1"
                            :description "default NES bindings on OpenEmu"}))

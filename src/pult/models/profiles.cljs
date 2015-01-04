@@ -7,7 +7,6 @@
 (def default-profile {:id 0
                       :name "new"
                       :saved? false ;should be false when cloning or creating new
-                      :changed? true
                       :description "Please rename before saving!"
                       :mappings {:btn-up    :UP
                                  :btn-right :RIGHT
@@ -20,11 +19,11 @@
 
 (defn create
   [opts]
-   (merge default-profile
-          {:id (current-time)}
-          opts))
+  (merge default-profile
+         {:id (current-time)}
+         opts))
 
-;;TODO: add profile schema
+;;TODO: add profile schema and validation
 (defn add
   ([db profile-dt]
     (add db profile-dt #(log "Added new profile:" (pr-str %))))

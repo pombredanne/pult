@@ -258,7 +258,7 @@
                       (load-db-data db-conn app-state))
                     ;-- if database isnot initialized aka no seed data
                     (do
-                      (log "DB was not initialized.")
+                      (log "DB is not initialized.")
                       ;TODO: better alerting
                       (show-error "Please wait! Initializing settings.")
                       (db/add-seed-data! db-conn #(locate! "./index.html")))))]

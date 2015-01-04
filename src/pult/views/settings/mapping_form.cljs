@@ -50,9 +50,58 @@
                :style {:display (if (nil? @validation-error) "none" "block")}}
          [:p (str @validation-error)]]])))
 
-(defn profile-form
-  [db profiles-cur profile-id]
-  (let [profile (cursor [:items profile-id] profiles-cur)
+(defn metadata-fields
+  [db profile-cur]
+  (let [changed-cur (atom false)
+        name-cur (atom (:name @profile-cur))
+        desc-cur (atom (:description @profile-cur))
+        on-input-change (fn [item-cur ev]
+                          (reset! changed-cur true)
+                          (reset! item-cur (-> ev .-target .-value str)))
+         on-save (fn [profile-cur ev]
+                  (let [profile @profile-cur
+                        profile-id (:id profile)
+                        new-profile (assoc profile :saved? true
+                                                   :name @name-cur
+                                                   :description @desc-cur)]
+                    (.preventDefault ev) ; dont fire FORM submit event
+                    (log "Saving profile: " profile-id " : " (:name profile))
+                    (reset! profile-cur new-profile)
+                    (profile-mdl/upsert
+                      db new-profile
+                      (fn [row] (log "Saved new item: " (pr-str new-profile))))))]
+    (fn []
+      [:fieldset {:class "pure-group"}
+        [:legend [:strong "Profile information"]]
+        [:div {:class "pure-control-group"}
+         [:label {:for "name"} "Name: "]
+         [:input
+            {:id "name" :name "name"
+             :type "text"
+             :class "pure-input-1 pure-input-lg-1-2 pure-input-md-1-2"
+             :placeholder "Profile name"
+             :autoComplete "off"
+             :defaultValue (str @name-cur)
+             :on-change (partial on-input-change name-cur)}]]
+        [:div {:class "pure-control-group"}
+          [:label {:for "description"} "Description: "]
+          [:textarea
+            {:type "text"
+             :class "pure-input-1"
+             :defaultValue (str @desc-cur)
+             :placeholder "Profile description"
+             :autoComplete "off"
+             :on-change (partial on-input-change desc-cur)}]]
+        [:div {:class "pure-controls"}
+          [:button {:class "pure-button pure-button-primary pure-input-1"
+                    :style {:display (if @changed-cur "block" "none")}
+                    :on-click (partial on-save profile-cur)}
+           [:span [:i {:class "fa fa-save"} " "] " Save"]]]])))
+
+(defn controller-fields
+  [db profile-cur]
+  (let [changed-cur (atom false)
+        local-profile-cur (atom @profile-cur)
         selector-validator (fn [profile-cur old-val ev]
                              ;returns false if didnt pass validation
                              (let [key-val (-> ev .-target .-value keyword)
@@ -61,68 +110,44 @@
                                (or
                                  (= old-val key-val)
                                  (not-used? reserved-vals key-val))))
+
         on-selector-change (fn [profile-cur key-id ev]
                              (let [new-key-val (-> ev .-target .-value keyword)]
                                (log "Updating selector value to: " new-key-val)
+                               (reset! changed-cur true)
                                (swap! profile-cur
-                                      (fn [xs]
-                                        (-> xs
-                                          (assoc :changed? true)
-                                          (assoc-in [:mappings key-id] new-key-val))))))
-        on-input-change (fn [profile-cur input-id ev]
-                          (swap! profile-cur
-                                 (fn [xs]
-                                   (assoc xs
-                                          :changed? true
-                                          input-id (-> ev .-target .-value)))))
-        on-save (fn [profile-cur ev]
-                  (let [profile @profile-cur
-                        profile-id (:id profile)
-                        new-profile (assoc profile :saved? true :changed? false)]
+                                      #(assoc-in % [:mappings key-id] new-key-val))))
+
+        on-save (fn [local-profile-cur ev]
+                  (let [new-profile (assoc @local-profile-cur :saved? true)]
                     (.preventDefault ev) ; dont fire FORM submit event
-                    (log "Saving profile:" profile-id ":" (:name profile))
+                    (log "Saving mappings: " (:name new-profile))
                     (reset! profile-cur new-profile)
                     (profile-mdl/upsert
                       db new-profile
-                      (fn [row] (log "Saved new item: " (pr-str new-profile))))))]
+                      #(log "Saved profile: " (:name new-profile)))))]
+    (fn []
+      [:fieldset {:class "pure-group"}
+        [:legend [:strong "Controller keys"]]
+        (for [[k v] (:mappings @local-profile-cur)]
+          ^{:key (str k "_" v)} ;required meta-data for React
+          [(button-selector k v
+                           (partial on-selector-change local-profile-cur k)
+                           (partial selector-validator local-profile-cur v))])
+        [:div {:class "pure-controls"}
+          [:button {:class "pure-button pure-button-primary pure-input-1"
+                    :style {:display (if @changed-cur "block" "none")}
+                    :on-click (partial on-save local-profile-cur)}
+           [:span [:i {:class "fa fa-save"} " "] " Save"]]]
+      ])))
+
+(defn profile-form
+  [db profiles-cur profile-id]
+  (let [profile (cursor [:items profile-id] profiles-cur)]
     [:div {:class "pure-u-1"}
       [:form {:class "pure-form pure-form-stacked"}
-        [:fieldset {:class "pure-group"}
-          [:legend
-            [:strong "Profile information"]]
-          [:div {:class "pure-u-1"}
-           [:label {:for "name"} "Name: "]
-           [:input
-              {:id "name" :name "name"
-               :type "text"
-               :class "pure-input-1 pure-input-lg-1-2 pure-input-md-1-2"
-               :placeholder "Profile name"
-               :autoComplete "off"
-               :defaultValue (:name @profile)
-               :on-change (partial on-input-change profile :name)}]]
-          [:div {:class "pure-control-group"}
-            [:label {:for "description"} "Description: "]
-            [:textarea
-              {:type "text"
-               :class "pure-input-1"
-               :defaultValue (:description @profile)
-               :placeholder "Profile description"
-               :autoComplete "off"
-               :on-change (partial on-input-change profile :description)}]]]
-
-        [:fieldset
-          {:class "pure-group"}
-          [:legend [:strong "Controller keys"]]
-          (for [[k v] (:mappings @profile)]
-            ^{:key (str k "_" v)} ;required meta-data for React
-            [(button-selector k v
-                             (partial on-selector-change profile k)
-                             (partial selector-validator profile v))])]
-          ;;TODO: does it updates already existing profile?
-          [:button {:class "pure-button pure-button-primary pure-input-1"
-                    :style {:display (if (:changed? @profile) "block" "none")}
-                    :on-click (partial on-save profile)}
-           [:span [:i {:class "fa fa-save"} " "] "Save"]]]]))
+        [(metadata-fields db profile)]
+        [(controller-fields db profile)]]]))
 
 (defn profile-controls
   [db profiles-cur profile-id]
@@ -177,15 +202,15 @@
          {:class "pure-button button-success pure-u-1-3"
           :style {:display (if active? "inline-block" "none")}
           :on-click (partial on-activate db profiles-cur profile-id)}
-         [:i {:class "fa fa-power-off"} " "] "Deactivate"]
+         [:i {:class "fa fa-power-off"} " "] " Deactivate"]
         [:button
           {:class "pure-button button-secondary pure-u-1-3"
            :style {:display (if active? "none" "inline-block")}
            :on-click (fn [ev]
-                      (.log js/console "User activated profile: " profile-id)
+                      (log "User activated profile: " profile-id)
                       (active-profile-mdl/add db @profile)
                       (swap! profiles-cur (fn [xs] (assoc xs :active profile-id))))}
-          [:i {:class "fa fa-power-off"} " "] "Activate"]]))
+          [:i {:class "fa fa-power-off"} " "] " Activate"]]))
 
 (defn render
   [app-state]
