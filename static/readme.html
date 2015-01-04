@@ -1,29 +1,48 @@
 <h1>Pult</h1>
 
-<p>Pult ( <em>i.e &quot;remote controller&quot; in estonian</em> ) is <em>HTML5</em> app that turns any device that can run modern web browser into a classic game controller. 
-It&#39;s designed for mobilephones with touchscreens, but it works also on a desktop or on a raspberryPI with keyboard.</p>
+<p><a href="https://gitter.im/tauho/pult?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img alt="Gitter" src="https://badges.gitter.im/Join%20Chat.svg"/></a></p>
+
+<p>Pult ( <em>i.e &quot;remote controller&quot; in estonian</em> ) is <em>HTML5</em> app that turns any device with modern web browser into a game controller.</p>
+
+<p>It&#39;s designed for FirefoxOS phones with touchscreens, but it works also on a desktop or on the RaspberryPI with keyboard.</p>
 
 <p><img alt="Pult" src="img/pult.png"/></p>
 
-<p>I like to play retrogames and a laptop is not the most comfortable gaming device and believe me 8bit games look much better on 27&quot; screen or projector - pixels are bigger. So i built this app to get away from a laptop, stream a laptop screen onto a bigger screen and play on a couch.</p>
+<p><strong>Motivation</strong></p>
 
-<p>Plus it has longer range than you average USB remote controller, easy to switch keyboard mappings and it makes it possible to games with team.</p>
+<p>I love retrogames and a laptop is not the most comfortable gaming device when a game is streamed onto a bigger screen.</p>
+
+<p>8bit games look much better on 27&quot; screen or on a projector - pixels are bigger. So i built this app to get away from a laptop, play on a couch without being tangled into wires.</p>
+
+<p><strong>How it can help you?</strong></p>
+
+<p><code>Pult</code> gives you opportunity to control old DOS or Nintendo games running on openEMU without buying extra hardware or being attached to a computer.</p>
+
+<p>Being wireless gives you longer range than your average USB remote controller and with WIFI it reaches even further than your Wii or EggsBox controller. </p>
+
+<p>Few things that make <code>pult</code> unique:</p>
+
+<ul><li>it runs on a mobile &amp; a desktop</li><li>can share game without swapping remotes
+(<em>for example a parent can help her kids out from darkest corner of Dungeons&amp;Dragons</em>)</li><li>free as speech</li></ul>
 
 <h2>Usage</h2>
 
-<p>Using the app should be simple:</p>
+<p>Using the app should be as simple as following:</p>
 
-<ul><li><p>open <code>index.html</code> on modern browser. FxOS owner has much more choices: install it with FirefoxIDE or via app-store.</p></li><li><p>check does a correct keymapping in an app configuration is activated</p></li><li>activate your WIFI</li><li>connect to <code>pult-server</code> running on your laptop.</li></ul>
+<ul><li><p>FirefoxOS owner can install it from app-store, or from <code>pult-server</code> or installing manually with Firefox webIDE. Users of other mobileOS or desktop should open <code>pult-server</code> url with Firefox browser and follow instructions from there.</p></li><li><p>check does a correct keymapping in an app configuration is activate. <em>If there&#39;s no keymappings yet, then click &quot;+&quot; button on the right-top corner, it will show a mappings editor with a default configuration</em>.</p></li><li><p>activate your WIFI</p></li><li>connect to <code>pult-server</code> by using its public IP.</li></ul>
 
-<p><a href="https://github.com/tauho/pult-server"><code>Pult-server</code></a> is web-server that listen incoming messages from pult-app and turns them into native keyboard actions.</p>
+<p><a href="https://github.com/tauho/pult-server"><code>Pult-server</code></a> is web-server (written in Clojure) that listen incoming messages from pult-app and turns them into native keyboard actions.</p>
 
 <h2>Contributing</h2>
 
 <p>Pult is currently in alpha stage:</p>
 
-<ul><li>full of technical debts - will be solved in the next release <code>0.2</code></li><li>a lag is bigger than it should be - planned for <code>0.3</code></li><li>design is made by programmer - will be solved in <code>?</code></li><li>no localization yet</li><li>documentation is in stage &quot;send me email with your questions&quot;;</li></ul>
+<ul><li>full of technical debts - will be solved in the next release <code>0.2</code></li><li>a lag is bigger than it should be - planned for <code>0.2</code></li><li>design is made by programmer - will be solved in <code>?</code></li><li>no localization yet</li><li>better &amp; more comprehensive documentation will be added after beta release;</li></ul>
 
 <p>It&#39;s my personal fun project and i made code publicly available so you can also learn more about Clojurescript and maybe fix some bugs, open tickets - it&#39;s much more effective than trolling on app-store;</p>
 
-<p>The sourcecode is available on github <a href="https://github.com/tauho/pult">https://github.com/tauho/pult</a>. 
-Contributions and feedbacks are more.</p>
+<p>The sourcecode is available on github <a href="https://github.com/tauho/pult">https://github.com/tauho/pult</a>. </p>
+
+<h4>Basic contribution workflow</h4>
+
+<ul><li>open issue or send message on Gitter</li><li>Let&#39;s discuss about it.</li><li>Forked it.</li><li>Make changes on new branch;</li><li>Dont forget to add tests.</li><li>Make pull request.</li></ul>

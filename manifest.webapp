@@ -2,19 +2,19 @@
   "name" : "pult",
   "type" : "web",
   "version": "0.0.1",
-  "description" : "A boilerplate for FirefoxOS",
+  "description" : "A game controller for OpenEmu",
   "launch_path" : "/index.html",
   "icons" : {
     "512" : "/img/icon-512.png",
     "128" : "/img/icon-128.png"
   },
   "developer" : {
-    "name" : "Name of your organization or team",
-    "url"  : "https://www.your.org"
+    "name" : "Timo Sulg, @timgluz",
+    "url"  : "https://github.com/tauho/pult"
   },
   "default_locale" : "en",
   "chrome" : {"navigation" : false},
-  "fullscreen" : false,
+  "fullscreen" : true,
   "orientation" : "landscape",
   "origin" : "app://pult.app",
   "permissions" : {
