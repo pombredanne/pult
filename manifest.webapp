@@ -1,7 +1,7 @@
 {
   "name" : "pult",
   "type" : "web",
-  "version": "0.0.1",
+  "version": "0.1",
   "description" : "A game controller for OpenEmu",
   "launch_path" : "/index.html",
   "icons" : {
@@ -13,12 +13,6 @@
     "url"  : "https://github.com/tauho/pult"
   },
   "default_locale" : "en",
-  "chrome" : {"navigation" : false},
-  "fullscreen" : true,
-  "orientation" : "landscape",
-  "origin" : "app://pult.app",
-  "permissions" : {
-    "push" : {"description" : "Required for being updated after ..."}
-  },
-  "docs":  "https://developer.mozilla.org/en-US/Apps/Build/Manifest"
+  "fullscreen" : "true",
+  "orientation" : "landscape"
 }
