@@ -1,5 +1,7 @@
 all: staticpages
 
+release: clean staticpages css compile rm-target pack
+
 #generates static pages from Markdown
 #it expects that you have markdown.js already installed
 #if not, run `npm install markdown`
@@ -14,5 +16,17 @@ css:
 
 clean:
 	lein clean
-	rm js/pult*.js
+	rm -f js/pult*.js
+	rm -rf ./target
+	rm -rf ./test
+	rm -f pult.zip
+
+rm-target:
+	rm -rf ./target
+
+compile:
+	lein cljsbuild once prod
+
+pack:
+	zip -r pult.zip *
 
